@@ -34,23 +34,37 @@ int choose_key(int key, void *tracer)
 	return (0);
 }
 
+double	deg_to_rad(double degrees)
+{
+	return (degrees * M_PI / 180);
+}
+
+void	ft_swap(double *a, double *b)
+{
+	double temp;
+
+	temp = *a;
+	*a = *b;
+	*b = temp;
+}
+
 void	draw_line(t_tracer *tracer, t_point p1, t_point p2)
 {
 	int dx = (p2.x - p1.x >= 0 ? 1 : -1);
 	int dy = (p2.y - p1.y >= 0 ? 1 : -1);
 
-	float lengthX = abs(p2.x - p1.x);
-	float lengthY = abs(p2.y - p1.y);
+	double lengthX = abs(p2.x - p1.x);
+	double lengthY = abs(p2.y - p1.y);
 
-	float length = fmax(lengthX, lengthY);
+	double length = fmax(lengthX, lengthY);
 
 	if (length == 0)
 		mlx_pixel_put(tracer->mlx_ptr, tracer->win_ptr, p1.x, p1.y, 0x00FF00);
 	if (lengthY <= lengthX)
 	{
-		float x = p1.x;
-		float y = p1.y;
-		float d = -lengthX;
+		double x = p1.x;
+		double y = p1.y;
+		double d = -lengthX;
 
 		length++;
 		while (length--)
@@ -67,9 +81,9 @@ void	draw_line(t_tracer *tracer, t_point p1, t_point p2)
 	}
 	else
 	{
-		float x = p1.x;
-		float y = p1.y;
-		float d = -lengthY;
+		double x = p1.x;
+		double y = p1.y;
+		double d = -lengthY;
 
 		length++;
 		while (length--)
@@ -87,6 +101,93 @@ void	draw_line(t_tracer *tracer, t_point p1, t_point p2)
 	}
 }
 
+void	info_about_point(t_point *point)
+{
+	printf("=======================================\n");
+	printf("point->x = %f\n", point->x);
+	printf("point->y = %f\n", point->y);
+	printf("point->z = %f\n", point->z);
+	printf("point->color = %d\n", point->color);
+}
+
+void	info_about_sphere(t_sphere *sphere)
+{
+	printf("=======================================\n");
+	printf("sphere->center->x = %f\n", sphere->center->x);
+	printf("sphere->center->y = %f\n", sphere->center->y);
+	printf("sphere->center->z = %f\n", sphere->center->z);
+	printf("shpere->radius = %f\n", sphere->radius);
+	printf("sphere->color = %d\n", sphere->color);
+}
+
+void	add_sphere_to_list(t_sphere **head, t_sphere *sphere)
+{
+	t_sphere *current;
+
+	current = *head;
+	if (current == NULL)
+	{
+		*head = sphere;
+	}
+	else
+	{
+		while (current->next != NULL)
+			current = current->next;
+		current->next = sphere;
+	}
+}
+
+void	print_list(t_sphere *head)
+{
+	t_sphere *current;
+
+	current = head;
+	while (current != NULL)
+	{
+		info_about_sphere(current);
+		current = current->next;
+	}
+}
+
+void	info_about_matrix4x4(double (*matrix)[4])
+{
+	int i;
+	int j;
+
+	i = 0;
+	while (i < 4)
+	{
+		j = 0;
+		while (j < 4)
+		{
+			printf("%f ", matrix[i][j]);
+			j++;
+		}
+		printf("\n");
+		i++;
+	}
+}
+
+t_sphere *init_sphere(t_point *center, double radius, int color)
+{
+	t_sphere *sphere;
+
+	sphere = (t_sphere *)malloc(sizeof(t_sphere));
+	sphere->center = center;
+	sphere->radius = radius;
+	sphere->color = color;
+
+	sphere->next = NULL;
+	return (sphere);
+}
+
+t_sphere *create_spheres()
+{
+	t_sphere *spheres;
+
+
+
+}
 
 void convert_to_conterclock(t_point *corners)
 {
@@ -124,19 +225,129 @@ void draw(t_tracer *tracer)
 		printf("projected corner: %d x:%f y:%f\n", i, x_proj, y_proj);
 
 		// normalize points to range [0, 1]
-		float x_proj_remap = (1 + x_proj) / 2;
-		float y_proj_remap = (1 + y_proj) / 2;
+		double x_proj_remap = (1 + x_proj) / 2;
+		double y_proj_remap = (1 + y_proj) / 2;
 		printf("remap corner: %d x:%f y:%f\n", i, x_proj_remap, y_proj_remap);
 
 
-		float x_proj_pix = x_proj_remap * WIDTH;
-		float y_proj_pix = y_proj_remap * HEIGHT;
+		double x_proj_pix = x_proj_remap * WIDTH;
+		double y_proj_pix = y_proj_remap * HEIGHT;
 		printf("in pixels: %d x:%f y:%f\n", i, x_proj_pix, y_proj_pix);
 
 		mlx_pixel_put(tracer->mlx_ptr, tracer->win_ptr, 
 			x_proj_pix, y_proj_pix, corners[i].color);		
 
 		printf("\n");
+	}
+}
+
+void	put_pixel(t_tracer *tracer, int x, int y, int color)
+{
+	int screen_x;
+	int screen_y;
+
+	screen_x = WIDTH / 2 + x;
+	screen_y = HEIGHT / 2 - y - 1;
+
+	if (screen_x < 0 || screen_x >= WIDTH || screen_y < 0 || screen_y >= HEIGHT)
+		return ;
+
+	mlx_pixel_put(tracer->mlx_ptr, tracer->win_ptr, screen_x, screen_y, color);
+}
+
+t_point *canvas_to_viewport(int x, int y)
+{
+	t_point *view_point;
+	double	a;
+	double	b;
+
+	a = x * VIEWPORT_SIZE / (double)WIDTH;
+	b = y * VIEWPORT_SIZE / (double)HEIGHT;
+	view_point = create_point(a, b, PROJECTION_PLANE_Z);
+	return (view_point);
+}
+
+double	*intersect_ray_sphere(t_tracer *tracer, t_point *direction, t_sphere *sphere)
+{
+	t_point *oc;
+	double	k1;
+	double 	k2;
+	double	k3;
+
+	double discriminant;
+	double t1;
+	double t2;
+
+	double	*res = (double *)malloc(sizeof(double) * 2);
+
+	oc = subtraction_points(tracer->camera_position, sphere->center);
+
+	k1 = dot_product(direction, direction);
+	k2 = 2 * dot_product(oc, direction);
+	k3 = dot_product(oc, oc) - sphere->radius * sphere->radius;
+
+	discriminant = k2 * k2 - 4 * k1 * k3;
+	if (discriminant < 0)
+	{
+		res[0] = INFINIT;
+		res[1] = INFINIT;
+		return (res);
+	}
+
+	t1 = (-k2 + sqrt(discriminant)) / (2 * k1);
+	t2 = (-k2 - sqrt(discriminant)) / (2 * k1);
+	res[0] = t1;
+	res[1] = t2;
+	return (res);
+}
+
+int		trace_ray(t_tracer *tracer, t_point *direction, t_sphere *spheres)
+{
+	int closest_t = INFINIT;
+	t_sphere *closest_sphere = NULL;
+	t_sphere *current_sphere;
+	double *ts;
+
+	current_sphere = spheres;
+	while (current_sphere != NULL)
+	{
+		ts = intersect_ray_sphere(tracer, direction, current_sphere);
+		if (ts[0] < closest_t && MIN_T < ts[0] && ts[0] < INFINIT)
+		{
+			closest_t = ts[0];
+			closest_sphere = current_sphere;
+		}
+		if (ts[1] < closest_t && MIN_T < ts[1] && ts[1] < INFINIT)
+		{
+			closest_t = ts[1];
+			closest_sphere = current_sphere;	
+		}
+		current_sphere = current_sphere->next;
+	}
+
+	if (closest_sphere == NULL)
+		return (0xFFFFFF);
+
+	return closest_sphere->color;
+}
+
+void	render(t_tracer *tracer, t_sphere *spheres)
+{
+	int x;
+	int y;
+
+	x = -WIDTH / 2;
+	while (x < WIDTH / 2)
+	{
+		y = -HEIGHT / 2;
+		while (y < HEIGHT / 2)
+		{
+			t_point *direction = canvas_to_viewport(x, y);
+			int color = trace_ray(tracer, direction, spheres);
+			put_pixel(tracer, x, y, color);
+			y++;
+		}
+		x++;
 	}
 }
 
@@ -150,7 +361,18 @@ int main(int argc, char const **argv)
 	tracer->mlx_ptr = mlx_init();
 	tracer->win_ptr = mlx_new_window(tracer->mlx_ptr, WIDTH, HEIGHT, "TRACER");
 
-	draw(tracer);
+	// draw(tracer);
+	t_sphere *spheres = NULL;
+
+	t_sphere *r_sphere = init_sphere(create_point(0, -1, 3), 1, 0xFF0000);
+	add_sphere_to_list(&spheres, r_sphere);
+	t_sphere *b_sphere = init_sphere(create_point(2, 0, 4), 1, 0x0000FF);
+	add_sphere_to_list(&spheres, b_sphere);
+	t_sphere *g_sphere = init_sphere(create_point(-2, 0, 4), 1, 0x00FF00);
+	add_sphere_to_list(&spheres, g_sphere);
+
+	tracer->camera_position = create_point(0, 0, 0);	
+	render(tracer, spheres);
 
 	mlx_hook(tracer->win_ptr, 2, 5, choose_key, tracer);
 	mlx_loop(tracer->mlx_ptr);

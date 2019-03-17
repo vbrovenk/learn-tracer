@@ -1,6 +1,14 @@
-
-
-
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   raytray.h                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vbrovenk <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/08/21 16:57:51 by vbrovenk          #+#    #+#             */
+/*   Updated: 2018/08/21 16:57:52 by vbrovenk         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #ifndef RAYTRAY_H
 #define RAYTRAY_H
@@ -13,6 +21,14 @@
 #define WIDTH 512
 #define HEIGHT 512
 
+#define MIN_T 1
+#define INFINIT 2147483647
+
+
+#define VIEWPORT_SIZE 1
+#define PROJECTION_PLANE_Z 1
+#define FOV 60
+
 #define ESC 65307
 
 typedef struct s_point
@@ -23,6 +39,20 @@ typedef struct s_point
 
 	int color;
 }				t_point;
+
+typedef	struct	s_m4x4
+{
+	double	matrix[4][4];
+}				t_m4x4;
+
+typedef	struct s_sphere
+{
+	t_point	*center;
+	double	radius;
+	int		color;
+
+	struct s_sphere *next;
+}				t_sphere;
 
 
 typedef struct s_tracer
@@ -36,7 +66,25 @@ typedef struct s_tracer
 	int	size_line;
 	int endian;
 
+	// for ray-tracer
+	t_point *camera_position;
+
 }				t_tracer;
+
+
+/*
+** actions_with_points.c
+*/
+t_point *create_point(double x, double y, double z);
+t_point *subtraction_points(t_point *end, t_point *start);
+t_point *addition_points(t_point *end, t_point *start);
+double	dot_product(t_point *p1, t_point *p2);
+t_point *normalize(t_point *p);
+
+/*
+** actions_with_matrix.c
+*/
+t_point *mult_vec_matrix(t_point *vec, double (*m)[4]);
 
 
 #endif
