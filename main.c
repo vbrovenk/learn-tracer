@@ -48,58 +48,6 @@ void	ft_swap(double *a, double *b)
 	*b = temp;
 }
 
-void	draw_line(t_tracer *tracer, t_point p1, t_point p2)
-{
-	int dx = (p2.x - p1.x >= 0 ? 1 : -1);
-	int dy = (p2.y - p1.y >= 0 ? 1 : -1);
-
-	double lengthX = abs(p2.x - p1.x);
-	double lengthY = abs(p2.y - p1.y);
-
-	double length = fmax(lengthX, lengthY);
-
-	if (length == 0)
-		mlx_pixel_put(tracer->mlx_ptr, tracer->win_ptr, p1.x, p1.y, 0x00FF00);
-	if (lengthY <= lengthX)
-	{
-		double x = p1.x;
-		double y = p1.y;
-		double d = -lengthX;
-
-		length++;
-		while (length--)
-		{
-			mlx_pixel_put(tracer->mlx_ptr, tracer->win_ptr, x, y, 0x00FF00);
-			x += dx;
-			d += 2 * lengthY;
-			if (d > 0)
-			{
-				d -= 2 * lengthX;
-				y += dy;
-			}
-		}
-	}
-	else
-	{
-		double x = p1.x;
-		double y = p1.y;
-		double d = -lengthY;
-
-		length++;
-		while (length--)
-		{
-			mlx_pixel_put(tracer->mlx_ptr, tracer->win_ptr, x, y, 0x00FF00);
-			y += dy;
-			d += 2 * lengthX;
-			if (d > 0)
-			{
-				d -= 2 * lengthY;
-				x += dx;
-			}
-		}
-
-	}
-}
 
 void	info_about_point(t_point *point)
 {
@@ -120,6 +68,16 @@ void	info_about_sphere(t_sphere *sphere)
 	printf("sphere->color = %d\n", sphere->color);
 }
 
+void	info_about_light(t_light *light)
+{
+	printf("=======================================\n");
+	printf("light->position->x = %f\n", light->position->x);
+	printf("light->position->y = %f\n", light->position->y);
+	printf("light->position->z = %f\n", light->position->z);
+	printf("light->type = %d\n", light->type);
+	printf("light->intensity = %f\n", light->intensity);
+}
+
 void	add_sphere_to_list(t_sphere **head, t_sphere *sphere)
 {
 	t_sphere *current;
@@ -137,7 +95,24 @@ void	add_sphere_to_list(t_sphere **head, t_sphere *sphere)
 	}
 }
 
-void	print_list(t_sphere *head)
+void	add_light_to_list(t_light **head, t_light *light)
+{
+	t_light *current;
+
+	current = *head;
+	if (current == NULL)
+	{
+		*head = light;
+	}
+	else
+	{
+		while (current->next != NULL)
+			current = current->next;
+		current->next = light;
+	}
+}
+
+void	print_list_spheres(t_sphere *head)
 {
 	t_sphere *current;
 
@@ -145,6 +120,18 @@ void	print_list(t_sphere *head)
 	while (current != NULL)
 	{
 		info_about_sphere(current);
+		current = current->next;
+	}
+}
+
+void	print_list_lights(t_light *head)
+{
+	t_light *current;
+
+	current = head;
+	while (current != NULL)
+	{
+		info_about_light(current);
 		current = current->next;
 	}
 }
@@ -181,12 +168,17 @@ t_sphere *init_sphere(t_point *center, double radius, int color)
 	return (sphere);
 }
 
-t_sphere *create_spheres()
+t_light	*create_light(t_point *position, int type, double intensity)
 {
-	t_sphere *spheres;
+	t_light *new_light;
 
+	new_light = (t_light *)malloc(sizeof(t_light));
+	new_light->position = position;
+	new_light->type = type;
+	new_light->intensity = intensity;
 
-
+	new_light->next = NULL;
+	return(new_light);
 }
 
 void convert_to_conterclock(t_point *corners)
@@ -278,30 +270,76 @@ double	*intersect_ray_sphere(t_tracer *tracer, t_point *direction, t_sphere *sph
 	double t1;
 	double t2;
 
-	double	*res = (double *)malloc(sizeof(double) * 2);
+	double	*res = malloc(sizeof(double) * 2);
 
-	oc = subtraction_points(tracer->camera_position, sphere->center);
+	oc = subtract_points(tracer->camera_position, sphere->center);
 
 	k1 = dot_product(direction, direction);
-	k2 = 2 * dot_product(oc, direction);
+	k2 = 2.0 * dot_product(oc, direction);
 	k3 = dot_product(oc, oc) - sphere->radius * sphere->radius;
 
-	discriminant = k2 * k2 - 4 * k1 * k3;
-	if (discriminant < 0)
+	discriminant = k2 * k2 - 4.0 * k1 * k3;
+	if (discriminant < 0.0)
 	{
 		res[0] = INFINIT;
 		res[1] = INFINIT;
 		return (res);
 	}
 
-	t1 = (-k2 + sqrt(discriminant)) / (2 * k1);
-	t2 = (-k2 - sqrt(discriminant)) / (2 * k1);
+	t1 = (-k2 - sqrt(discriminant)) / (double)(2.0 * k1);
+	t2 = (-k2 + sqrt(discriminant)) / (double)(2.0 * k1);
 	res[0] = t1;
 	res[1] = t2;
 	return (res);
 }
 
-int		trace_ray(t_tracer *tracer, t_point *direction, t_sphere *spheres)
+double	compute_lighting(t_light *lights, t_point *point, t_point *normal)
+{
+	double intensity = 0;
+	double length_n = length_vec(normal);
+
+	t_light *current;
+
+	current = lights;	
+	while (current != NULL)
+	{
+		if (current->type == AMBIENT)
+			intensity += current->intensity;
+		else
+		{
+			t_point *vec_l;
+			if (current->type == POINT)
+				vec_l = subtract_points(current->position, point);
+			else // DIRECTIONAL
+				vec_l = current->position;
+
+			double n_dot_l = dot_product(normal, vec_l);
+			if (n_dot_l > 0)
+				intensity += current->intensity * n_dot_l / (length_n * length_vec(vec_l));
+		}
+		current = current->next;
+	}
+	return (intensity);
+}
+
+int		mult_k_color(double k, int color)
+{
+	int r;
+	int g;
+	int b;
+
+	r = (0xFF0000 & color) >> 16;
+	g = (0x00FF00 & color) >> 8;
+	b = (0x0000FF & color);
+
+
+	r *= k;
+	g *= k;
+	b *= k;
+	return ((r << 16) | (g << 8) | (b));
+}
+
+int		trace_ray(t_tracer *tracer, t_point *direction, t_sphere *spheres, t_light *lights)
 {
 	int closest_t = INFINIT;
 	t_sphere *closest_sphere = NULL;
@@ -328,10 +366,16 @@ int		trace_ray(t_tracer *tracer, t_point *direction, t_sphere *spheres)
 	if (closest_sphere == NULL)
 		return (0xFFFFFF);
 
+	// t_point *point = add_points(tracer->camera_position, mult_k_vec(closest_t, direction));
+	// t_point *normal = subtract_points(point, closest_sphere->center);
+	// normal = mult_k_vec(1.0 / length_vec(normal), normal);
+	
+	// double lighting = compute_lighting(lights, point, normal);
+	// return (mult_k_color(lighting, closest_sphere->color));
 	return closest_sphere->color;
 }
 
-void	render(t_tracer *tracer, t_sphere *spheres)
+void	render(t_tracer *tracer, t_sphere *spheres, t_light *lights)
 {
 	int x;
 	int y;
@@ -343,7 +387,7 @@ void	render(t_tracer *tracer, t_sphere *spheres)
 		while (y < HEIGHT / 2)
 		{
 			t_point *direction = canvas_to_viewport(x, y);
-			int color = trace_ray(tracer, direction, spheres);
+			int color = trace_ray(tracer, direction, spheres, lights);
 			put_pixel(tracer, x, y, color);
 			y++;
 		}
@@ -364,15 +408,29 @@ int main(int argc, char const **argv)
 	// draw(tracer);
 	t_sphere *spheres = NULL;
 
-	t_sphere *r_sphere = init_sphere(create_point(0, -1, 3), 1, 0xFF0000);
+	t_sphere *r_sphere = init_sphere(create_point(0, -1, 6), 1, 0xFF0000);
 	add_sphere_to_list(&spheres, r_sphere);
 	t_sphere *b_sphere = init_sphere(create_point(2, 0, 4), 1, 0x0000FF);
 	add_sphere_to_list(&spheres, b_sphere);
-	t_sphere *g_sphere = init_sphere(create_point(-2, 0, 4), 1, 0x00FF00);
+	t_sphere *g_sphere = init_sphere(create_point(-2, -1, 4), 1, 0x00FF00);
 	add_sphere_to_list(&spheres, g_sphere);
+	t_sphere *y_sphere = init_sphere(create_point(0, -5001, 0), 5000, 0xFFFF00);
+	add_sphere_to_list(&spheres, y_sphere);
 
-	tracer->camera_position = create_point(0, 0, 0);	
-	render(tracer, spheres);
+	tracer->camera_position = create_point(0, 0, 0);
+
+	// add light to scene
+	t_light *lights = NULL;
+
+	t_light *a_light = create_light(create_point(0, 0, 0), AMBIENT, 0.2);
+	add_light_to_list(&lights, a_light);
+	t_light *p_light = create_light(create_point(2, 1, 0), POINT, 0.6);
+	add_light_to_list(&lights, p_light);
+	t_light *d_light = create_light(create_point(1, 4, 4), DIRECTIONAL, 0.2);
+	add_light_to_list(&lights, d_light);
+	// print_list_lights(lights);
+
+	render(tracer, spheres, lights);
 
 	mlx_hook(tracer->win_ptr, 2, 5, choose_key, tracer);
 	mlx_loop(tracer->mlx_ptr);

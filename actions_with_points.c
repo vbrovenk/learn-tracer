@@ -24,7 +24,7 @@ t_point *create_point(double x, double y, double z)
 	return (new);
 }
 
-t_point *subtraction_points(t_point *end, t_point *start)
+t_point *subtract_points(t_point *end, t_point *start)
 {
 	t_point *new;
 
@@ -35,7 +35,7 @@ t_point *subtraction_points(t_point *end, t_point *start)
 	return (new);
 }
 
-t_point *addition_points(t_point *end, t_point *start)
+t_point *add_points(t_point *end, t_point *start)
 {
 	t_point *new;
 
@@ -77,4 +77,24 @@ t_point *normalize(t_point *p)
 		new->z = p->z;
 	}
 	return (new);
+}
+
+t_point *mult_k_vec(double k, t_point *vec)
+{
+	double x;
+	double y;
+	double z;
+
+	x = k * vec->x;
+	y = k * vec->y;
+	z = k * vec->z;
+	return (create_point(x, y, z));
+}
+
+double	length_vec(t_point *vec)
+{
+	double length;
+
+	length = sqrt(vec->x * vec->x + vec->y * vec->y + vec->z * vec->z);
+	return (length);
 }

@@ -24,10 +24,17 @@
 #define MIN_T 1
 #define INFINIT 2147483647
 
-
 #define VIEWPORT_SIZE 1
 #define PROJECTION_PLANE_Z 1
 #define FOV 60
+
+
+/*
+** For light
+*/
+#define AMBIENT 11
+#define POINT 12
+#define DIRECTIONAL 13
 
 #define ESC 65307
 
@@ -54,6 +61,14 @@ typedef	struct s_sphere
 	struct s_sphere *next;
 }				t_sphere;
 
+typedef struct s_light
+{
+	t_point	*position;
+	int		type;
+	double	intensity;
+	
+	struct s_light *next;
+}				t_light;
 
 typedef struct s_tracer
 {
@@ -76,10 +91,12 @@ typedef struct s_tracer
 ** actions_with_points.c
 */
 t_point *create_point(double x, double y, double z);
-t_point *subtraction_points(t_point *end, t_point *start);
-t_point *addition_points(t_point *end, t_point *start);
+t_point *subtract_points(t_point *end, t_point *start);
+t_point *add_points(t_point *end, t_point *start);
 double	dot_product(t_point *p1, t_point *p2);
 t_point *normalize(t_point *p);
+t_point *mult_k_vec(double k, t_point *vec);
+double	length_vec(t_point *vec);
 
 /*
 ** actions_with_matrix.c
