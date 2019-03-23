@@ -339,9 +339,9 @@ int		mult_k_color(double k, int color)
 	return ((r << 16) | (g << 8) | (b));
 }
 
-int		trace_ray(t_tracer *tracer, t_point *direction, t_sphere *spheres, t_light *lights)
+int		trace_ray(t_tracer *tracer, t_point *direction, t_sphere *spheres, t_light *lights, int x, int y)
 {
-	int closest_t = INFINIT;
+	double closest_t = INFINIT; // Prosto durachok, ispolsoval zdes tip INT !!!!
 	t_sphere *closest_sphere = NULL;
 	t_sphere *current_sphere;
 	double *ts;
@@ -366,13 +366,15 @@ int		trace_ray(t_tracer *tracer, t_point *direction, t_sphere *spheres, t_light 
 	if (closest_sphere == NULL)
 		return (0xFFFFFF);
 
-	// t_point *point = add_points(tracer->camera_position, mult_k_vec(closest_t, direction));
-	// t_point *normal = subtract_points(point, closest_sphere->center);
-	// normal = mult_k_vec(1.0 / length_vec(normal), normal);
+	t_point *point = add_points(tracer->camera_position, mult_k_vec(closest_t, direction));
+	t_point *normal = subtract_points(point, closest_sphere->center);
+	normal = mult_k_vec(1.0 / length_vec(normal), normal);
 	
-	// double lighting = compute_lighting(lights, point, normal);
-	// return (mult_k_color(lighting, closest_sphere->color));
-	return closest_sphere->color;
+	double lighting = compute_lighting(lights, point, normal);
+	return (mult_k_color(lighting, closest_sphere->color));
+
+	// for STEP 1
+	// return closest_sphere->color;
 }
 
 void	render(t_tracer *tracer, t_sphere *spheres, t_light *lights)
@@ -387,7 +389,7 @@ void	render(t_tracer *tracer, t_sphere *spheres, t_light *lights)
 		while (y < HEIGHT / 2)
 		{
 			t_point *direction = canvas_to_viewport(x, y);
-			int color = trace_ray(tracer, direction, spheres, lights);
+			int color = trace_ray(tracer, direction, spheres, lights, x, y);
 			put_pixel(tracer, x, y, color);
 			y++;
 		}
@@ -408,11 +410,11 @@ int main(int argc, char const **argv)
 	// draw(tracer);
 	t_sphere *spheres = NULL;
 
-	t_sphere *r_sphere = init_sphere(create_point(0, -1, 6), 1, 0xFF0000);
+	t_sphere *r_sphere = init_sphere(create_point(0, -1, 3), 1, 0xFF0000);
 	add_sphere_to_list(&spheres, r_sphere);
 	t_sphere *b_sphere = init_sphere(create_point(2, 0, 4), 1, 0x0000FF);
 	add_sphere_to_list(&spheres, b_sphere);
-	t_sphere *g_sphere = init_sphere(create_point(-2, -1, 4), 1, 0x00FF00);
+	t_sphere *g_sphere = init_sphere(create_point(-2, 0, 4), 1, 0x00FF00);
 	add_sphere_to_list(&spheres, g_sphere);
 	t_sphere *y_sphere = init_sphere(create_point(0, -5001, 0), 5000, 0xFFFF00);
 	add_sphere_to_list(&spheres, y_sphere);
