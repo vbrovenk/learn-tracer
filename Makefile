@@ -15,7 +15,7 @@ INCLUDE = raytray.h
 LIBFT_INC = ./libft/includes/
 LIBFT = libft/libft.a
 MLX_FLAGS = -lmlx -framework OpenGL -framework AppKit
-UBUNTU_FLAGS = -lm -lmlx -lXext -lX11 -L libmlx -I libmlx
+UBUNTU_FLAGS = -lm -lmlx -lXext -lX11 -L minilibx -I minilibx
 SRC =	main.c \
 		actions_with_points.c \
 		actions_with_matrix.c

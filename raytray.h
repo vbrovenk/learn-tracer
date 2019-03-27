@@ -20,6 +20,7 @@
 
 #define WIDTH 512
 #define HEIGHT 512
+#define BACKGROUND 0xFFFFFF
 
 #define MIN_T 1
 #define INFINIT 2147483647

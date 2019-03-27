@@ -270,7 +270,9 @@ double	*intersect_ray_sphere(t_tracer *tracer, t_point *direction, t_sphere *sph
 	double t1;
 	double t2;
 
-	double	*res = malloc(sizeof(double) * 2);
+	double	*res;
+
+	res = malloc(sizeof(double) * 2);
 
 	oc = subtract_points(tracer->camera_position, sphere->center);
 
@@ -295,25 +297,27 @@ double	*intersect_ray_sphere(t_tracer *tracer, t_point *direction, t_sphere *sph
 
 double	compute_lighting(t_light *lights, t_point *point, t_point *normal)
 {
-	double intensity = 0;
-	double length_n = length_vec(normal);
+	double		intensity;
+	double		length_n;
+	t_light		*current;
+	double		n_dot_l;
+	t_point		*vec_l;
 
-	t_light *current;
-
-	current = lights;	
+	length_n = length_vec(normal);
+	current = lights;
+	intensity = 0;	
 	while (current != NULL)
 	{
 		if (current->type == AMBIENT)
 			intensity += current->intensity;
 		else
 		{
-			t_point *vec_l;
 			if (current->type == POINT)
 				vec_l = subtract_points(current->position, point);
 			else // DIRECTIONAL
 				vec_l = current->position;
 
-			double n_dot_l = dot_product(normal, vec_l);
+			n_dot_l = dot_product(normal, vec_l);
 			if (n_dot_l > 0)
 				intensity += current->intensity * n_dot_l / (length_n * length_vec(vec_l));
 		}
@@ -339,13 +343,15 @@ int		mult_k_color(double k, int color)
 	return ((r << 16) | (g << 8) | (b));
 }
 
-int		trace_ray(t_tracer *tracer, t_point *direction, t_sphere *spheres, t_light *lights, int x, int y)
+int		trace_ray(t_tracer *tracer, t_point *direction, t_sphere *spheres, t_light *lights)
 {
-	double closest_t = INFINIT; // Prosto durachok, ispolsoval zdes tip INT !!!!
-	t_sphere *closest_sphere = NULL;
-	t_sphere *current_sphere;
-	double *ts;
+	double		closest_t;
+	t_sphere	*closest_sphere;
+	t_sphere	*current_sphere;
+	double		*ts;
 
+	closest_t = INFINIT;
+	closest_sphere = NULL;
 	current_sphere = spheres;
 	while (current_sphere != NULL)
 	{
@@ -364,13 +370,18 @@ int		trace_ray(t_tracer *tracer, t_point *direction, t_sphere *spheres, t_light 
 	}
 
 	if (closest_sphere == NULL)
-		return (0xFFFFFF);
+		return (BACKGROUND);
 
-	t_point *point = add_points(tracer->camera_position, mult_k_vec(closest_t, direction));
-	t_point *normal = subtract_points(point, closest_sphere->center);
+	// added in STEP 2
+	t_point		*point;
+	t_point		*normal;
+	double		lighting;
+
+	point = add_points(tracer->camera_position, mult_k_vec(closest_t, direction));
+	normal = subtract_points(point, closest_sphere->center);
 	normal = mult_k_vec(1.0 / length_vec(normal), normal);
 	
-	double lighting = compute_lighting(lights, point, normal);
+	lighting = compute_lighting(lights, point, normal);
 	return (mult_k_color(lighting, closest_sphere->color));
 
 	// for STEP 1
@@ -381,6 +392,7 @@ void	render(t_tracer *tracer, t_sphere *spheres, t_light *lights)
 {
 	int x;
 	int y;
+	int color;
 
 	x = -WIDTH / 2;
 	while (x < WIDTH / 2)
@@ -389,7 +401,7 @@ void	render(t_tracer *tracer, t_sphere *spheres, t_light *lights)
 		while (y < HEIGHT / 2)
 		{
 			t_point *direction = canvas_to_viewport(x, y);
-			int color = trace_ray(tracer, direction, spheres, lights, x, y);
+			color = trace_ray(tracer, direction, spheres, lights);
 			put_pixel(tracer, x, y, color);
 			y++;
 		}
@@ -428,8 +440,9 @@ int main(int argc, char const **argv)
 	add_light_to_list(&lights, a_light);
 	t_light *p_light = create_light(create_point(2, 1, 0), POINT, 0.6);
 	add_light_to_list(&lights, p_light);
-	t_light *d_light = create_light(create_point(1, 4, 4), DIRECTIONAL, 0.2);
+	t_light *d_light = create_light(create_point(4, 4, -2), DIRECTIONAL, 0.2);
 	add_light_to_list(&lights, d_light);
+
 	// print_list_lights(lights);
 
 	render(tracer, spheres, lights);
