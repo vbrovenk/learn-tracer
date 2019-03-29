@@ -59,6 +59,7 @@ typedef	struct s_sphere
 	double	radius;
 	int		color;
 
+	double	specular;
 	struct s_sphere *next;
 }				t_sphere;
 

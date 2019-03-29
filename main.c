@@ -66,6 +66,7 @@ void	info_about_sphere(t_sphere *sphere)
 	printf("sphere->center->z = %f\n", sphere->center->z);
 	printf("shpere->radius = %f\n", sphere->radius);
 	printf("sphere->color = %d\n", sphere->color);
+	printf("sphere->specular = %f\n", sphere->specular);
 }
 
 void	info_about_light(t_light *light)
@@ -155,7 +156,7 @@ void	info_about_matrix4x4(double (*matrix)[4])
 	}
 }
 
-t_sphere *init_sphere(t_point *center, double radius, int color)
+t_sphere *init_sphere(t_point *center, double radius, int color, double specular)
 {
 	t_sphere *sphere;
 
@@ -164,6 +165,7 @@ t_sphere *init_sphere(t_point *center, double radius, int color)
 	sphere->radius = radius;
 	sphere->color = color;
 
+	sphere->specular = specular;
 	sphere->next = NULL;
 	return (sphere);
 }
@@ -295,17 +297,20 @@ double	*intersect_ray_sphere(t_tracer *tracer, t_point *direction, t_sphere *sph
 	return (res);
 }
 
-double	compute_lighting(t_light *lights, t_point *point, t_point *normal)
+double	compute_lighting(t_light *lights, t_point *point, t_point *normal,
+													t_point *view, double specular)
 {
 	double		intensity;
 	double		length_n;
 	t_light		*current;
 	double		n_dot_l;
 	t_point		*vec_l;
+	// for specular
+	double		length_v = length_vec(view);
 
 	length_n = length_vec(normal);
 	current = lights;
-	intensity = 0;	
+	intensity = 0;
 	while (current != NULL)
 	{
 		if (current->type == AMBIENT)
@@ -317,9 +322,24 @@ double	compute_lighting(t_light *lights, t_point *point, t_point *normal)
 			else // DIRECTIONAL
 				vec_l = current->position;
 
+			// Diffuse reflection
 			n_dot_l = dot_product(normal, vec_l);
 			if (n_dot_l > 0)
 				intensity += current->intensity * n_dot_l / (length_n * length_vec(vec_l));
+
+			// Specular reflection
+			if (specular != -1)
+			{
+				t_point *vec_r;
+				double	r_dot_l;
+				t_point *mult_vec;
+
+				mult_vec = mult_k_vec(2.0 * dot_product(normal, vec_l), normal);
+				vec_r = subtract_points(mult_vec, vec_l);
+				r_dot_l = dot_product(vec_r, view);
+				if (r_dot_l > 0)
+					intensity += current->intensity * pow(r_dot_l / (length_vec(vec_r) * length_v), specular);
+			}
 		}
 		current = current->next;
 	}
@@ -336,10 +356,15 @@ int		mult_k_color(double k, int color)
 	g = (0x00FF00 & color) >> 8;
 	b = (0x0000FF & color);
 
-
 	r *= k;
 	g *= k;
 	b *= k;
+
+	// Clamps a color to the canonical color range.
+	r = fmin(255, fmax(0, r));
+	g = fmin(255, fmax(0, g));
+	b = fmin(255, fmax(0, b));
+
 	return ((r << 16) | (g << 8) | (b));
 }
 
@@ -381,7 +406,10 @@ int		trace_ray(t_tracer *tracer, t_point *direction, t_sphere *spheres, t_light 
 	normal = subtract_points(point, closest_sphere->center);
 	normal = mult_k_vec(1.0 / length_vec(normal), normal);
 	
-	lighting = compute_lighting(lights, point, normal);
+	// for STEP 3
+	t_point *view = mult_k_vec(-1, direction);
+
+	lighting = compute_lighting(lights, point, normal, view, closest_sphere->specular);
 	return (mult_k_color(lighting, closest_sphere->color));
 
 	// for STEP 1
@@ -422,13 +450,13 @@ int main(int argc, char const **argv)
 	// draw(tracer);
 	t_sphere *spheres = NULL;
 
-	t_sphere *r_sphere = init_sphere(create_point(0, -1, 3), 1, 0xFF0000);
+	t_sphere *r_sphere = init_sphere(create_point(0, -1, 3), 1, 0xFF0000, 500);
 	add_sphere_to_list(&spheres, r_sphere);
-	t_sphere *b_sphere = init_sphere(create_point(2, 0, 4), 1, 0x0000FF);
+	t_sphere *b_sphere = init_sphere(create_point(2, 0, 4), 1, 0x0000FF, 500);
 	add_sphere_to_list(&spheres, b_sphere);
-	t_sphere *g_sphere = init_sphere(create_point(-2, 0, 4), 1, 0x00FF00);
+	t_sphere *g_sphere = init_sphere(create_point(-2, 0, 4), 1, 0x00FF00, 10);
 	add_sphere_to_list(&spheres, g_sphere);
-	t_sphere *y_sphere = init_sphere(create_point(0, -5001, 0), 5000, 0xFFFF00);
+	t_sphere *y_sphere = init_sphere(create_point(0, -5001, 0), 5000, 0xFFFF00, 1000);
 	add_sphere_to_list(&spheres, y_sphere);
 
 	tracer->camera_position = create_point(0, 0, 0);
@@ -440,7 +468,7 @@ int main(int argc, char const **argv)
 	add_light_to_list(&lights, a_light);
 	t_light *p_light = create_light(create_point(2, 1, 0), POINT, 0.6);
 	add_light_to_list(&lights, p_light);
-	t_light *d_light = create_light(create_point(4, 4, -2), DIRECTIONAL, 0.2);
+	t_light *d_light = create_light(create_point(1, 4, 4), DIRECTIONAL, 0.2);
 	add_light_to_list(&lights, d_light);
 
 	// print_list_lights(lights);
