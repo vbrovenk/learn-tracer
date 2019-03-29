@@ -12,11 +12,14 @@
 
 #include "raytray.h"
 
-void	init_struct(t_tracer *fdf)
+void	init_struct(t_tracer *tracer)
 {
-	fdf->mlx_ptr = NULL;
-	fdf->win_ptr = NULL;
+	tracer->mlx_ptr = NULL;
+	tracer->win_ptr = NULL;
 
+	tracer->camera_position = NULL;
+	tracer->spheres = NULL;
+	tracer->lights = NULL;
 }
 
 
@@ -261,7 +264,7 @@ t_point *canvas_to_viewport(int x, int y)
 	return (view_point);
 }
 
-double	*intersect_ray_sphere(t_tracer *tracer, t_point *direction, t_sphere *sphere)
+double	*intersect_ray_sphere(t_tracer *tracer, t_point *origin, t_point *direction, t_sphere *sphere)
 {
 	t_point *oc;
 	double	k1;
@@ -276,7 +279,7 @@ double	*intersect_ray_sphere(t_tracer *tracer, t_point *direction, t_sphere *sph
 
 	res = malloc(sizeof(double) * 2);
 
-	oc = subtract_points(tracer->camera_position, sphere->center);
+	oc = subtract_points(origin, sphere->center);
 
 	k1 = dot_product(direction, direction);
 	k2 = 2.0 * dot_product(oc, direction);
@@ -297,7 +300,35 @@ double	*intersect_ray_sphere(t_tracer *tracer, t_point *direction, t_sphere *sph
 	return (res);
 }
 
-double	compute_lighting(t_light *lights, t_point *point, t_point *normal,
+int		closest_intersection(t_tracer *tracer, t_point *origin, t_point *direction,
+											double *closest_t, t_sphere **closest_sphere,
+											double min_t, double max_t)
+{
+	t_sphere	*current_sphere;
+	double		*ts;
+
+	current_sphere = tracer->spheres;
+	while (current_sphere != NULL)
+	{
+		ts = intersect_ray_sphere(tracer, origin, direction, current_sphere);
+		if (ts[0] < *closest_t && min_t < ts[0] && ts[0] < max_t)
+		{
+			*closest_t = ts[0];
+			*closest_sphere = current_sphere;
+		}
+		if (ts[1] < *closest_t && min_t < ts[1] && ts[1] < max_t)
+		{
+			*closest_t = ts[1];
+			*closest_sphere = current_sphere;	
+		}
+		current_sphere = current_sphere->next;
+	}
+	if (*closest_sphere != NULL)
+		return (1);
+	return (0);
+}
+
+double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 													t_point *view, double specular)
 {
 	double		intensity;
@@ -306,21 +337,44 @@ double	compute_lighting(t_light *lights, t_point *point, t_point *normal,
 	double		n_dot_l;
 	t_point		*vec_l;
 	// for specular
-	double		length_v = length_vec(view);
+	double		length_v;
 
 	length_n = length_vec(normal);
-	current = lights;
+	length_v = length_vec(view);
+
 	intensity = 0;
+	current = tracer->lights;
 	while (current != NULL)
 	{
 		if (current->type == AMBIENT)
 			intensity += current->intensity;
 		else
 		{
+			double t_max;
+
 			if (current->type == POINT)
+			{
 				vec_l = subtract_points(current->position, point);
+				t_max = 1.0;
+			}
 			else // DIRECTIONAL
+			{
 				vec_l = current->position;
+				t_max = INFINIT;
+			}
+
+			// Shadow check
+			double		closest_t;
+			t_sphere	*closest_sphere;
+
+			closest_t = INFINIT;
+			closest_sphere = NULL;
+			int	blocker = closest_intersection(tracer, point, vec_l, &closest_t, &closest_sphere, EPSILON, t_max);
+			if (blocker == 1)
+			{
+				current = current->next;
+				continue;
+			}
 
 			// Diffuse reflection
 			n_dot_l = dot_product(normal, vec_l);
@@ -368,31 +422,14 @@ int		mult_k_color(double k, int color)
 	return ((r << 16) | (g << 8) | (b));
 }
 
-int		trace_ray(t_tracer *tracer, t_point *direction, t_sphere *spheres, t_light *lights)
+int		trace_ray(t_tracer *tracer, t_point *direction)
 {
 	double		closest_t;
 	t_sphere	*closest_sphere;
-	t_sphere	*current_sphere;
-	double		*ts;
 
 	closest_t = INFINIT;
 	closest_sphere = NULL;
-	current_sphere = spheres;
-	while (current_sphere != NULL)
-	{
-		ts = intersect_ray_sphere(tracer, direction, current_sphere);
-		if (ts[0] < closest_t && MIN_T < ts[0] && ts[0] < INFINIT)
-		{
-			closest_t = ts[0];
-			closest_sphere = current_sphere;
-		}
-		if (ts[1] < closest_t && MIN_T < ts[1] && ts[1] < INFINIT)
-		{
-			closest_t = ts[1];
-			closest_sphere = current_sphere;	
-		}
-		current_sphere = current_sphere->next;
-	}
+	closest_intersection(tracer, tracer->camera_position, direction, &closest_t, &closest_sphere, 1.0, INFINIT);
 
 	if (closest_sphere == NULL)
 		return (BACKGROUND);
@@ -409,14 +446,14 @@ int		trace_ray(t_tracer *tracer, t_point *direction, t_sphere *spheres, t_light 
 	// for STEP 3
 	t_point *view = mult_k_vec(-1, direction);
 
-	lighting = compute_lighting(lights, point, normal, view, closest_sphere->specular);
+	lighting = compute_lighting(tracer, point, normal, view, closest_sphere->specular);
 	return (mult_k_color(lighting, closest_sphere->color));
 
 	// for STEP 1
 	// return closest_sphere->color;
 }
 
-void	render(t_tracer *tracer, t_sphere *spheres, t_light *lights)
+void	render(t_tracer *tracer)
 {
 	int x;
 	int y;
@@ -429,13 +466,14 @@ void	render(t_tracer *tracer, t_sphere *spheres, t_light *lights)
 		while (y < HEIGHT / 2)
 		{
 			t_point *direction = canvas_to_viewport(x, y);
-			color = trace_ray(tracer, direction, spheres, lights);
+			color = trace_ray(tracer, direction);
 			put_pixel(tracer, x, y, color);
 			y++;
 		}
 		x++;
 	}
 }
+
 
 // compilation without FLAGS
 int main(int argc, char const **argv)
@@ -448,32 +486,33 @@ int main(int argc, char const **argv)
 	tracer->win_ptr = mlx_new_window(tracer->mlx_ptr, WIDTH, HEIGHT, "TRACER");
 
 	// draw(tracer);
-	t_sphere *spheres = NULL;
+	// t_sphere *spheres = NULL;
 
 	t_sphere *r_sphere = init_sphere(create_point(0, -1, 3), 1, 0xFF0000, 500);
-	add_sphere_to_list(&spheres, r_sphere);
+	add_sphere_to_list(&tracer->spheres, r_sphere);
 	t_sphere *b_sphere = init_sphere(create_point(2, 0, 4), 1, 0x0000FF, 500);
-	add_sphere_to_list(&spheres, b_sphere);
+	add_sphere_to_list(&tracer->spheres, b_sphere);
 	t_sphere *g_sphere = init_sphere(create_point(-2, 0, 4), 1, 0x00FF00, 10);
-	add_sphere_to_list(&spheres, g_sphere);
+	add_sphere_to_list(&tracer->spheres, g_sphere);
 	t_sphere *y_sphere = init_sphere(create_point(0, -5001, 0), 5000, 0xFFFF00, 1000);
-	add_sphere_to_list(&spheres, y_sphere);
+	add_sphere_to_list(&tracer->spheres, y_sphere);
 
+	// print_list_spheres(tracer->spheres);
 	tracer->camera_position = create_point(0, 0, 0);
 
 	// add light to scene
-	t_light *lights = NULL;
+	// t_light *lights = NULL;
 
 	t_light *a_light = create_light(create_point(0, 0, 0), AMBIENT, 0.2);
-	add_light_to_list(&lights, a_light);
+	add_light_to_list(&tracer->lights, a_light);
 	t_light *p_light = create_light(create_point(2, 1, 0), POINT, 0.6);
-	add_light_to_list(&lights, p_light);
+	add_light_to_list(&tracer->lights, p_light);
 	t_light *d_light = create_light(create_point(1, 4, 4), DIRECTIONAL, 0.2);
-	add_light_to_list(&lights, d_light);
+	add_light_to_list(&tracer->lights, d_light);
 
-	// print_list_lights(lights);
+	// print_list_lights(tracer->lights);
 
-	render(tracer, spheres, lights);
+	render(tracer);
 
 	mlx_hook(tracer->win_ptr, 2, 5, choose_key, tracer);
 	mlx_loop(tracer->mlx_ptr);

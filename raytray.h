@@ -24,6 +24,7 @@
 
 #define MIN_T 1
 #define INFINIT 2147483647
+#define EPSILON 0.001
 
 #define VIEWPORT_SIZE 1
 #define PROJECTION_PLANE_Z 1
@@ -85,6 +86,10 @@ typedef struct s_tracer
 
 	// for ray-tracer
 	t_point *camera_position;
+	
+	t_sphere	*spheres;
+	t_light		*lights;
+
 
 }				t_tracer;
 
