@@ -18,27 +18,28 @@
 #include "libft.h"
 #include <mlx.h>
 
-#define WIDTH 512
-#define HEIGHT 512
-#define BACKGROUND 0xFFFFFF
+# define WIDTH 512
+# define HEIGHT 512
+# define BACKGROUND 0xFFFFFF
 
-#define MIN_T 1
-#define INFINIT 2147483647
-#define EPSILON 0.001
+# define MIN_T 1
+# define INFINIT 2147483647
+# define EPSILON 0.001
+# define RECURSION_DEPTH 1
 
-#define VIEWPORT_SIZE 1
-#define PROJECTION_PLANE_Z 1
-#define FOV 60
+# define VIEWPORT_SIZE 1
+# define PROJECTION_PLANE_Z 1
+# define FOV 60
 
 
 /*
 ** For light
 */
-#define AMBIENT 11
-#define POINT 12
-#define DIRECTIONAL 13
+# define AMBIENT 11
+# define POINT 12
+# define DIRECTIONAL 13
 
-#define ESC 65307
+# define ESC 65307
 
 typedef struct s_point
 {
@@ -61,6 +62,8 @@ typedef	struct s_sphere
 	int		color;
 
 	double	specular;
+	double	reflective;
+
 	struct s_sphere *next;
 }				t_sphere;
 
@@ -93,6 +96,11 @@ typedef struct s_tracer
 
 }				t_tracer;
 
+typedef	struct s_closest
+{
+	double		closest_t;
+	t_sphere	*closest_sphere;
+}				t_closest;
 
 /*
 ** actions_with_points.c

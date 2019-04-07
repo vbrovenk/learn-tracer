@@ -70,6 +70,8 @@ void	info_about_sphere(t_sphere *sphere)
 	printf("shpere->radius = %f\n", sphere->radius);
 	printf("sphere->color = %d\n", sphere->color);
 	printf("sphere->specular = %f\n", sphere->specular);
+	printf("sphere->reflective = %f\n", sphere->reflective);
+
 }
 
 void	info_about_light(t_light *light)
@@ -159,7 +161,8 @@ void	info_about_matrix4x4(double (*matrix)[4])
 	}
 }
 
-t_sphere *init_sphere(t_point *center, double radius, int color, double specular)
+t_sphere *init_sphere(t_point *center, double radius, int color,
+										double specular, double reflective)
 {
 	t_sphere *sphere;
 
@@ -169,6 +172,7 @@ t_sphere *init_sphere(t_point *center, double radius, int color, double specular
 	sphere->color = color;
 
 	sphere->specular = specular;
+	sphere->reflective = reflective;
 	sphere->next = NULL;
 	return (sphere);
 }
@@ -264,6 +268,14 @@ t_point *canvas_to_viewport(int x, int y)
 	return (view_point);
 }
 
+t_point *reflect_ray(t_point *vec1, t_point *vec2)
+{
+	t_point *temp;
+
+	temp = mult_k_vec(2 * dot_product(vec1, vec2), vec2);
+	return (subtract_points(temp, vec1));
+}
+
 double	*intersect_ray_sphere(t_tracer *tracer, t_point *origin, t_point *direction, t_sphere *sphere)
 {
 	t_point *oc;
@@ -300,32 +312,43 @@ double	*intersect_ray_sphere(t_tracer *tracer, t_point *origin, t_point *directi
 	return (res);
 }
 
-int		closest_intersection(t_tracer *tracer, t_point *origin, t_point *direction,
-											double *closest_t, t_sphere **closest_sphere,
+t_closest	*init_closest(void)
+{
+	t_closest	*closest;
+
+	closest = (t_closest *)malloc(sizeof(t_closest));
+	closest->closest_t = INFINIT;
+	closest->closest_sphere = NULL;
+	return (closest);
+}
+
+t_closest	*closest_intersection(t_tracer *tracer, t_point *origin, t_point *direction,
 											double min_t, double max_t)
 {
 	t_sphere	*current_sphere;
 	double		*ts;
+	t_closest	*closest_params;
 
+	closest_params = init_closest();
 	current_sphere = tracer->spheres;
 	while (current_sphere != NULL)
 	{
 		ts = intersect_ray_sphere(tracer, origin, direction, current_sphere);
-		if (ts[0] < *closest_t && min_t < ts[0] && ts[0] < max_t)
+		if (ts[0] < closest_params->closest_t && min_t < ts[0] && ts[0] < max_t)
 		{
-			*closest_t = ts[0];
-			*closest_sphere = current_sphere;
+			closest_params->closest_t = ts[0];
+			closest_params->closest_sphere = current_sphere;
 		}
-		if (ts[1] < *closest_t && min_t < ts[1] && ts[1] < max_t)
+		if (ts[1] < closest_params->closest_t && min_t < ts[1] && ts[1] < max_t)
 		{
-			*closest_t = ts[1];
-			*closest_sphere = current_sphere;	
+			closest_params->closest_t = ts[1];
+			closest_params->closest_sphere = current_sphere;	
 		}
 		current_sphere = current_sphere->next;
 	}
-	if (*closest_sphere != NULL)
-		return (1);
-	return (0);
+	if (closest_params->closest_sphere != NULL)
+		return (closest_params);
+	return (NULL);
 }
 
 double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
@@ -363,14 +386,9 @@ double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 				t_max = INFINIT;
 			}
 
-			// Shadow check
-			double		closest_t;
-			t_sphere	*closest_sphere;
-
-			closest_t = INFINIT;
-			closest_sphere = NULL;
-			int	blocker = closest_intersection(tracer, point, vec_l, &closest_t, &closest_sphere, EPSILON, t_max);
-			if (blocker == 1)
+			// Shadow check for STEP 4
+			t_closest *blocker = closest_intersection(tracer, point, vec_l, EPSILON, t_max);
+			if (blocker != NULL)
 			{
 				current = current->next;
 				continue;
@@ -385,14 +403,13 @@ double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 			if (specular != -1)
 			{
 				t_point *vec_r;
-				double	r_dot_l;
-				t_point *mult_vec;
+				double	r_dot_v;
 
-				mult_vec = mult_k_vec(2.0 * dot_product(normal, vec_l), normal);
-				vec_r = subtract_points(mult_vec, vec_l);
-				r_dot_l = dot_product(vec_r, view);
-				if (r_dot_l > 0)
-					intensity += current->intensity * pow(r_dot_l / (length_vec(vec_r) * length_v), specular);
+				vec_r = reflect_ray(vec_l, normal);
+
+				r_dot_v = dot_product(vec_r, view);
+				if (r_dot_v > 0)
+					intensity += current->intensity * pow(r_dot_v / (length_vec(vec_r) * length_v), specular);
 			}
 		}
 		current = current->next;
@@ -422,24 +439,25 @@ int		mult_k_color(double k, int color)
 	return ((r << 16) | (g << 8) | (b));
 }
 
-int		trace_ray(t_tracer *tracer, t_point *direction)
+int		trace_ray(t_tracer *tracer, t_point *origin, t_point *direction,
+									double t_min, double t_max, int depth)
 {
-	double		closest_t;
-	t_sphere	*closest_sphere;
+	t_closest	*closest_params;
 
-	closest_t = INFINIT;
-	closest_sphere = NULL;
-	closest_intersection(tracer, tracer->camera_position, direction, &closest_t, &closest_sphere, 1.0, INFINIT);
+	closest_params = closest_intersection(tracer, origin, direction, t_min, t_max);
 
-	if (closest_sphere == NULL)
+	if (closest_params == NULL)
 		return (BACKGROUND);
+
+	t_sphere *closest_sphere = closest_params->closest_sphere;
+	double	closest_t = closest_params->closest_t;
 
 	// added in STEP 2
 	t_point		*point;
 	t_point		*normal;
 	double		lighting;
 
-	point = add_points(tracer->camera_position, mult_k_vec(closest_t, direction));
+	point = add_points(origin, mult_k_vec(closest_t, direction));
 	normal = subtract_points(point, closest_sphere->center);
 	normal = mult_k_vec(1.0 / length_vec(normal), normal);
 	
@@ -447,7 +465,25 @@ int		trace_ray(t_tracer *tracer, t_point *direction)
 	t_point *view = mult_k_vec(-1, direction);
 
 	lighting = compute_lighting(tracer, point, normal, view, closest_sphere->specular);
-	return (mult_k_color(lighting, closest_sphere->color));
+
+	int local_color = mult_k_color(lighting, closest_sphere->color);
+
+
+	if (closest_sphere->reflective <= 0 || depth <= 0)
+		return (local_color);
+
+	t_point *reflected_ray = reflect_ray(view, normal);
+
+	int		reflected_color = trace_ray(tracer, point, reflected_ray, EPSILON, INFINIT, depth - 1);
+
+	int tmp_color1 = mult_k_color(1 - closest_sphere->reflective, local_color);
+	int tmp_color2 = mult_k_color(closest_sphere->reflective, reflected_color);
+
+	return(tmp_color1 + tmp_color2);
+
+
+	// STEP 4
+	// return (mult_k_color(lighting, closest_params->closest_sphere->color));
 
 	// for STEP 1
 	// return closest_sphere->color;
@@ -466,7 +502,8 @@ void	render(t_tracer *tracer)
 		while (y < HEIGHT / 2)
 		{
 			t_point *direction = canvas_to_viewport(x, y);
-			color = trace_ray(tracer, direction);
+			
+			color = trace_ray(tracer, tracer->camera_position, direction, 1.0, INFINIT, RECURSION_DEPTH);
 			put_pixel(tracer, x, y, color);
 			y++;
 		}
@@ -488,14 +525,16 @@ int main(int argc, char const **argv)
 	// draw(tracer);
 	// t_sphere *spheres = NULL;
 
-	t_sphere *r_sphere = init_sphere(create_point(0, -1, 3), 1, 0xFF0000, 500);
+	t_sphere *r_sphere = init_sphere(create_point(0, -1, 3), 1, 0xFF0000, 500, 0.2);
 	add_sphere_to_list(&tracer->spheres, r_sphere);
-	t_sphere *b_sphere = init_sphere(create_point(2, 0, 4), 1, 0x0000FF, 500);
+	t_sphere *b_sphere = init_sphere(create_point(2, 0, 4), 1, 0x0000FF, 500, 0.3);
 	add_sphere_to_list(&tracer->spheres, b_sphere);
-	t_sphere *g_sphere = init_sphere(create_point(-2, 0, 4), 1, 0x00FF00, 10);
+	t_sphere *g_sphere = init_sphere(create_point(-2, 0, 4), 1, 0x00FF00, 10, 0.4);
 	add_sphere_to_list(&tracer->spheres, g_sphere);
-	t_sphere *y_sphere = init_sphere(create_point(0, -5001, 0), 5000, 0xFFFF00, 1000);
+	t_sphere *y_sphere = init_sphere(create_point(0, -5001, 0), 5000, 0xFFFF00, 1000, 0.5);
 	add_sphere_to_list(&tracer->spheres, y_sphere);
+
+	// print_list_spheres(tracer->spheres);
 
 	// print_list_spheres(tracer->spheres);
 	tracer->camera_position = create_point(0, 0, 0);
