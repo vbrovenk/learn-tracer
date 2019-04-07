@@ -18,8 +18,13 @@ void	init_struct(t_tracer *tracer)
 	tracer->win_ptr = NULL;
 
 	tracer->camera_position = NULL;
+	tracer->camera_rotation = NULL;
+
 	tracer->spheres = NULL;
 	tracer->lights = NULL;
+
+	tracer->degrees_x = 0;
+	tracer->degrees_y = 0;
 }
 
 
@@ -30,10 +35,33 @@ int		x_exit(void *param)
 	return (0);
 }
 
-int choose_key(int key, void *tracer)
+int choose_key(int key, t_tracer *tracer)
 {
 	if (key == ESC)
 		x_exit(tracer);
+	else if (key == ARROW_UP)
+		tracer->camera_position->z += 1;
+	else if (key == ARROW_DOWN)
+		tracer->camera_position->z -= 1;
+	else if (key == ARROW_LEFT)
+		tracer->camera_position->x -= 1;
+	else if (key == ARROW_RIGHT)
+		tracer->camera_position->x += 1;
+	else if (key == NUM_8)
+		tracer->camera_position->y += 1;
+	else if (key == NUM_2)
+		tracer->camera_position->y -= 1;
+	else if (key == KEY_W)
+		tracer->degrees_x -= 10;
+	else if (key == KEY_S)
+		tracer->degrees_x += 10;
+	else if (key == KEY_A)
+		tracer->degrees_y -= 10;
+	else if (key == KEY_D)
+		tracer->degrees_y += 10;
+
+	render(tracer);
+
 	return (0);
 }
 
@@ -502,7 +530,8 @@ void	render(t_tracer *tracer)
 		while (y < HEIGHT / 2)
 		{
 			t_point *direction = canvas_to_viewport(x, y);
-			
+			rotation_x(tracer);
+			direction = mult_vec_matrix(direction, tracer->camera_rotation);
 			color = trace_ray(tracer, tracer->camera_position, direction, 1.0, INFINIT, RECURSION_DEPTH);
 			put_pixel(tracer, x, y, color);
 			y++;
@@ -538,6 +567,7 @@ int main(int argc, char const **argv)
 
 	// print_list_spheres(tracer->spheres);
 	tracer->camera_position = create_point(0, 0, 0);
+	init_rotation(tracer);
 
 	// add light to scene
 	// t_light *lights = NULL;

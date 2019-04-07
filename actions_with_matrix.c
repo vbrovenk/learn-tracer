@@ -12,16 +12,14 @@
 
 #include "raytray.h"
 
-t_point *mult_vec_matrix(t_point *vec, double (*m)[4])
+t_point *mult_vec_matrix(t_point *vec, t_m3x3 *m)
 {
 	double a;
 	double b;
 	double c;
-	double w;
 
-	a = vec->x * m[0][0] + vec->y * m[1][0] + vec->z * m[2][0] + m[3][0];
-	b = vec->x * m[0][1] + vec->y * m[1][1] + vec->z * m[2][1] + m[3][1];
-	c = vec->x * m[0][2] + vec->y * m[1][2] + vec->z * m[2][2] + m[3][2];
-	w = vec->x * m[0][3] + vec->y * m[1][3] + vec->z * m[2][3] + m[3][3]; 
-	return (create_point(a / w, b / w, c / w));
+	a = vec->x * m->matrix[0][0] + vec->y * m->matrix[0][1] + vec->z * m->matrix[0][2] + m->matrix[0][3];
+	b = vec->x * m->matrix[1][0] + vec->y * m->matrix[1][1] + vec->z * m->matrix[1][2] + m->matrix[1][3];
+	c = vec->x * m->matrix[2][0] + vec->y * m->matrix[2][1] + vec->z * m->matrix[2][2] + m->matrix[2][3];
+	return (create_point(a, b, c));
 }
