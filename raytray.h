@@ -31,7 +31,7 @@
 # define PROJECTION_PLANE_Z 1
 # define FOV 60
 
-# define THREADS 4
+# define THREADS 1
 
 /*
 ** For light
@@ -40,6 +40,12 @@
 # define POINT 12
 # define DIRECTIONAL 13
 
+/*
+** shapes
+*/
+
+# define PLANE 20
+# define SPHERE 21
 
 /*
 ** Ubuntu buttons
@@ -84,6 +90,21 @@ typedef	struct s_sphere
 	struct s_sphere *next;
 }				t_sphere;
 
+typedef struct s_shape
+{
+	int		type;
+
+	t_point	*center;
+	double	radius;
+	int		color;
+
+	double	specular;
+	double	reflective;
+
+	struct s_shape *next;
+}				t_shape;
+
+
 typedef struct s_light
 {
 	t_point	*position;
@@ -109,6 +130,9 @@ typedef struct s_tracer
 	t_m3x3 *camera_rotation;
 	
 	t_sphere	*spheres;
+
+	t_shape		*shapes;
+
 	t_light		*lights;
 
 	int degrees_x;
@@ -121,7 +145,7 @@ typedef struct s_tracer
 typedef	struct s_closest
 {
 	double		closest_t;
-	t_sphere	*closest_sphere;
+	t_shape	*closest_shape;
 }				t_closest;
 
 
@@ -152,5 +176,28 @@ t_point *mult_vec_matrix(t_point *vec, t_m3x3 *m);
 */
 void	init_rotation(t_tracer *tracer);
 void	rotation_x(t_tracer *tracer);
+
+/*
+** create_add.c
+*/
+t_shape *create_shape(int type, t_point *center, double radius, int color,
+										double specular, double reflective);
+t_sphere *init_sphere(t_point *center, double radius, int color,
+										double specular, double reflective);
+t_light	*create_light(t_point *position, int type, double intensity);
+void	add_shape_to_list(t_shape **head, t_shape *shape);
+void	add_sphere_to_list(t_sphere **head, t_sphere *sphere);
+void	add_light_to_list(t_light **head, t_light *light);
+
+/*
+** print.c
+*/
+void	info_about_point(t_point *point);
+void	info_about_sphere(t_sphere *sphere);
+void	info_about_light(t_light *light);
+void	print_list_spheres(t_sphere *head);
+void	print_list_lights(t_light *head);
+void	info_about_matrix4x4(double (*matrix)[4]);
+
 
 #endif

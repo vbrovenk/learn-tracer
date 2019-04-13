@@ -19,7 +19,9 @@ UBUNTU_FLAGS = -lm -lmlx -lXext -lX11 -L minilibx -I minilibx
 SRC =	main.c \
 		actions_with_points.c \
 		actions_with_matrix.c \
-		rotation.c
+		rotation.c \
+		create_add.c \
+		print.c
 		
 OBJ = $(SRC:.c=.o)
 CFLAGS = -Wall -Wextra -Werror
