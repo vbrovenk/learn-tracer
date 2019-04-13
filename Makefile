@@ -38,7 +38,7 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	@make -C libft/
-	@gcc $(OBJ) $(LIBFT) $(UBUNTU_FLAGS) -o $(NAME)
+	@gcc $(OBJ) $(LIBFT) $(UBUNTU_FLAGS) -o $(NAME) -lpthread
 	@echo "$(PURPLEBOLD)Tracer is ready"
 
 %.o: %.c $(INCLUDE)

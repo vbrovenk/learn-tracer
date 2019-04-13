@@ -12,6 +12,8 @@
 
 #include "raytray.h"
 
+#include <pthread.h>
+
 void	init_struct(t_tracer *tracer)
 {
 	tracer->mlx_ptr = NULL;
@@ -60,7 +62,8 @@ int choose_key(int key, t_tracer *tracer)
 	else if (key == KEY_D)
 		tracer->degrees_y += 10;
 
-	render(tracer);
+	// render(tracer);
+	start_threads(tracer);
 
 	return (0);
 }
@@ -281,7 +284,8 @@ void	put_pixel(t_tracer *tracer, int x, int y, int color)
 	if (screen_x < 0 || screen_x >= WIDTH || screen_y < 0 || screen_y >= HEIGHT)
 		return ;
 
-	mlx_pixel_put(tracer->mlx_ptr, tracer->win_ptr, screen_x, screen_y, color);
+	// mlx_pixel_put(tracer->mlx_ptr, tracer->win_ptr, screen_x, screen_y, color);
+		tracer->image[screen_x + screen_y * HEIGHT] = color;
 }
 
 t_point *canvas_to_viewport(int x, int y)
@@ -374,6 +378,7 @@ t_closest	*closest_intersection(t_tracer *tracer, t_point *origin, t_point *dire
 		}
 		current_sphere = current_sphere->next;
 	}
+	free(ts);
 	if (closest_params->closest_sphere != NULL)
 		return (closest_params);
 	return (NULL);
@@ -389,6 +394,8 @@ double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 	t_point		*vec_l;
 	// for specular
 	double		length_v;
+
+
 
 	length_n = length_vec(normal);
 	length_v = length_vec(view);
@@ -438,6 +445,7 @@ double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 				r_dot_v = dot_product(vec_r, view);
 				if (r_dot_v > 0)
 					intensity += current->intensity * pow(r_dot_v / (length_vec(vec_r) * length_v), specular);
+				free(vec_r);
 			}
 		}
 		current = current->next;
@@ -486,6 +494,8 @@ int		trace_ray(t_tracer *tracer, t_point *origin, t_point *direction,
 	double		lighting;
 
 	point = add_points(origin, mult_k_vec(closest_t, direction));
+
+	// normal for sphere
 	normal = subtract_points(point, closest_sphere->center);
 	normal = mult_k_vec(1.0 / length_vec(normal), normal);
 	
@@ -507,6 +517,11 @@ int		trace_ray(t_tracer *tracer, t_point *origin, t_point *direction,
 	int tmp_color1 = mult_k_color(1 - closest_sphere->reflective, local_color);
 	int tmp_color2 = mult_k_color(closest_sphere->reflective, reflected_color);
 
+	free(closest_params);
+	free(point);
+	free(normal);
+	free(view);
+	free(reflected_ray);
 	return(tmp_color1 + tmp_color2);
 
 
@@ -526,20 +541,46 @@ void	render(t_tracer *tracer)
 	x = -WIDTH / 2;
 	while (x < WIDTH / 2)
 	{
-		y = -HEIGHT / 2;
-		while (y < HEIGHT / 2)
+		y = tracer->start;
+		while (y < tracer->start + HEIGHT / THREADS)
 		{
 			t_point *direction = canvas_to_viewport(x, y);
 			rotation_x(tracer);
 			direction = mult_vec_matrix(direction, tracer->camera_rotation);
 			color = trace_ray(tracer, tracer->camera_position, direction, 1.0, INFINIT, RECURSION_DEPTH);
 			put_pixel(tracer, x, y, color);
+			free(direction);
 			y++;
 		}
 		x++;
 	}
 }
 
+void	start_threads(t_tracer *tracer)
+{
+	pthread_t	threads[THREADS];
+	t_tracer	tracers[THREADS];
+	int i;
+	int temp_start;
+
+	i = 0;
+	temp_start = -HEIGHT / 2;
+	while (i < THREADS)
+	{
+		tracers[i] = *tracer;
+		tracers[i].start = temp_start;
+		pthread_create(&threads[i], NULL, (void *)render, &tracers[i]);
+		temp_start += HEIGHT / THREADS;
+		i++;
+	}
+	i = 0;
+	while (i < THREADS)
+	{
+		pthread_join(threads[i], NULL);
+		i++;
+	}
+	mlx_put_image_to_window(tracer->mlx_ptr, tracer->win_ptr, tracer->img_ptr, 0, 0);
+}
 
 // compilation without FLAGS
 int main(int argc, char const **argv)
@@ -550,6 +591,9 @@ int main(int argc, char const **argv)
 	init_struct(tracer);
 	tracer->mlx_ptr = mlx_init();
 	tracer->win_ptr = mlx_new_window(tracer->mlx_ptr, WIDTH, HEIGHT, "TRACER");
+	tracer->img_ptr = mlx_new_image(tracer->mlx_ptr, WIDTH, HEIGHT);
+	tracer->image = (int *)mlx_get_data_addr(tracer->img_ptr,
+		&tracer->bits_per_pixel, &tracer->size_line, &tracer->endian);
 
 	// draw(tracer);
 	// t_sphere *spheres = NULL;
@@ -581,7 +625,8 @@ int main(int argc, char const **argv)
 
 	// print_list_lights(tracer->lights);
 
-	render(tracer);
+	start_threads(tracer);
+	// render(tracer);
 
 	mlx_hook(tracer->win_ptr, 2, 5, choose_key, tracer);
 	mlx_loop(tracer->mlx_ptr);

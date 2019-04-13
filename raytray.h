@@ -18,8 +18,8 @@
 #include "libft.h"
 #include <mlx.h>
 
-# define WIDTH 160
-# define HEIGHT 160
+# define WIDTH 320
+# define HEIGHT 320
 # define BACKGROUND 0xFFFFFF
 
 # define MIN_T 1
@@ -31,6 +31,7 @@
 # define PROJECTION_PLANE_Z 1
 # define FOV 60
 
+# define THREADS 4
 
 /*
 ** For light
@@ -112,6 +113,9 @@ typedef struct s_tracer
 
 	int degrees_x;
 	int degrees_y;
+
+	// for threads;
+	int start;
 }				t_tracer;
 
 typedef	struct s_closest
@@ -125,7 +129,7 @@ typedef	struct s_closest
 ** main.c
 */
 void	render(t_tracer *tracer);
-
+void	start_threads(t_tracer *tracer);
 
 /*
 ** actions_with_points.c
