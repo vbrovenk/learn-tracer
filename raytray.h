@@ -20,7 +20,7 @@
 
 # define WIDTH 320
 # define HEIGHT 320
-# define BACKGROUND 0xFFFFFF
+# define BACKGROUND 0x000000
 
 # define MIN_T 1
 # define INFINIT 2147483647
@@ -50,36 +50,36 @@
 /*
 ** Ubuntu buttons
 */
-// # define ARROW_UP 65362
-// # define ARROW_DOWN 65364
-// # define ARROW_LEFT 65361
-// # define ARROW_RIGHT 65363
-// # define KEY_W 119
-// # define KEY_S 115
-// # define KEY_A 97
-// # define KEY_D 100
+# define ARROW_UP 65362
+# define ARROW_DOWN 65364
+# define ARROW_LEFT 65361
+# define ARROW_RIGHT 65363
+# define KEY_W 119
+# define KEY_S 115
+# define KEY_A 97
+# define KEY_D 100
 
-// # define NUM_8 65431
-// # define NUM_2 65433
+# define NUM_8 65431
+# define NUM_2 65433
 
-// # define ESC 65307
+# define ESC 65307
 
 /*
 ** MAC buttons
 */
-# define ARROW_UP 126
-# define ARROW_DOWN 125
-# define ARROW_LEFT 123
-# define ARROW_RIGHT 124
-# define KEY_W 13
-# define KEY_S 1
-# define KEY_A 0
-# define KEY_D 2
+// # define ARROW_UP 126
+// # define ARROW_DOWN 125
+// # define ARROW_LEFT 123
+// # define ARROW_RIGHT 124
+// # define KEY_W 13
+// # define KEY_S 1
+// # define KEY_A 0
+// # define KEY_D 2
 
-# define NUM_8 91
-# define NUM_2 84
+// # define NUM_8 91
+// # define NUM_2 84
 
-# define ESC 53
+// # define ESC 53
 
 typedef struct s_point
 {
@@ -193,6 +193,7 @@ t_point *mult_vec_matrix(t_point *vec, t_m3x3 *m);
 */
 void	init_rotation(t_tracer *tracer);
 void	rotation_x(t_tracer *tracer);
+void	rotation_y(t_tracer *tracer);
 
 /*
 ** create_add.c

@@ -24,6 +24,12 @@ void	rotation_x(t_tracer *tracer)
 	tracer->camera_rotation->matrix[1][2] = -sin(tracer->degrees_x * M_PI / 180);
 	tracer->camera_rotation->matrix[2][1] = sin(tracer->degrees_x * M_PI / 180);
 	tracer->camera_rotation->matrix[2][2] = cos(tracer->degrees_x * M_PI / 180);
+}
 
-
+void	rotation_y(t_tracer *tracer)
+{
+	tracer->camera_rotation->matrix[0][0] = cos(tracer->degrees_y * M_PI / 180);
+	tracer->camera_rotation->matrix[0][2] = sin(tracer->degrees_y * M_PI / 180);
+	tracer->camera_rotation->matrix[2][0] = -sin(tracer->degrees_y * M_PI / 180);
+	tracer->camera_rotation->matrix[2][2] = cos(tracer->degrees_y * M_PI / 180);
 }

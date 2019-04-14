@@ -73,23 +73,6 @@ double	deg_to_rad(double degrees)
 	return (degrees * M_PI / 180);
 }
 
-void	ft_swap(double *a, double *b)
-{
-	double temp;
-
-	temp = *a;
-	*a = *b;
-	*b = temp;
-}
-
-void convert_to_conterclock(t_point *corners)
-{
-	for (int i = 0; i < 8; i++)
-	{
-		corners[i].y *= -1;
-	}
-}
-
 void	put_pixel(t_tracer *tracer, int x, int y, int color)
 {
 	int screen_x;
@@ -120,9 +103,12 @@ t_point *canvas_to_viewport(int x, int y)
 t_point *reflect_ray(t_point *vec1, t_point *vec2)
 {
 	t_point *temp;
+	t_point *sub;
 
 	temp = mult_k_vec(2 * dot_product(vec1, vec2), vec2);
-	return (subtract_points(temp, vec1));
+	sub = subtract_points(temp, vec1);
+	free(temp);
+	return (sub);
 }
 
 double	*intersect_ray_sphere(t_tracer *tracer, t_point *origin, t_point *direction, t_shape *shape)
@@ -151,6 +137,7 @@ double	*intersect_ray_sphere(t_tracer *tracer, t_point *origin, t_point *directi
 	{
 		res[0] = INFINIT;
 		res[1] = INFINIT;
+		free(oc);
 		return (res);
 	}
 
@@ -158,6 +145,7 @@ double	*intersect_ray_sphere(t_tracer *tracer, t_point *origin, t_point *directi
 	t2 = (-k2 + sqrt(discriminant)) / (double)(2.0 * k1);
 	res[0] = t1;
 	res[1] = t2;
+	free(oc);
 	return (res);
 }
 
@@ -165,19 +153,25 @@ double	*intersect_ray_sphere(t_tracer *tracer, t_point *origin, t_point *directi
 double	*intersect_ray_plane(t_tracer *tracer, t_point *origin, t_point *direction, t_shape *shape)
 {
 	double	*res;
+	t_point *x;
 
 	res = malloc(sizeof(double) * 2);
-	t_point	*normal = create_point(0, 1, 0);
-	res[0] = -dot_product(subtract_points(origin, shape->center), normal);
-	res[1] = dot_product(direction, normal);
-	if (res[1] != 0.0)
+	x = subtract_points(origin, shape->center);
+
+	t_point *n = create_point(0, 1, 0);  // make field in struct - normal
+
+	res[0] = dot_product(direction, n);
+	res[1] = dot_product(x, n);
+	if (res[0])
 	{
-		res[0] = res[0] / res[1];
+		res[0] = -res[1] / res[0];
 		res[1] = INFINIT;
-		if (length_vec(subtract_points(add_points(mult_k_vec(res[0], direction), origin), shape->center)) > shape->radius)
-			res[0] = INFINIT;
+		free(x);
+		free(n);
 		return (res);
 	}
+	free(x);
+	free(n);
 	res[0] = INFINIT;
 	res[1] = INFINIT;
 	return (res);
@@ -200,6 +194,7 @@ t_closest	*closest_intersection(t_tracer *tracer, t_point *origin, t_point *dire
 	double		*ts;
 	t_closest	*closest_params;
 
+	ts = NULL;
 	closest_params = init_closest();
 	current_shape = tracer->shapes;
 	while (current_shape != NULL)
@@ -220,7 +215,8 @@ t_closest	*closest_intersection(t_tracer *tracer, t_point *origin, t_point *dire
 		}
 		current_shape = current_shape->next;
 	}
-	free(ts);
+	if (ts != NULL)
+		free(ts);
 	if (closest_params->closest_shape != NULL)
 		return (closest_params);
 	free(closest_params);
@@ -238,6 +234,8 @@ double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 	// for specular
 	double		length_v;
 
+	int need_free = 0;
+
 
 
 	length_n = length_vec(normal);
@@ -251,23 +249,25 @@ double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 			intensity += current->intensity;
 		else
 		{
-			double t_max;
+			double max;
 
 			if (current->type == POINT)
 			{
 				vec_l = subtract_points(current->position, point);
-				t_max = 1.0;
+				need_free = 1;
+				max = 1.0;
 			}
 			else // DIRECTIONAL
 			{
 				vec_l = current->position;
-				t_max = INFINIT;
+				max = INFINIT;
 			}
 
 			// Shadow check for STEP 4
-			t_closest *blocker = closest_intersection(tracer, point, vec_l, EPSILON, t_max);
+			t_closest *blocker = closest_intersection(tracer, point, vec_l, EPSILON, max);
 			if (blocker != NULL)
 			{
+				free(blocker);
 				current = current->next;
 				continue;
 			}
@@ -278,7 +278,7 @@ double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 				intensity += current->intensity * n_dot_l / (length_n * length_vec(vec_l));
 
 			// Specular reflection
-			if (specular != -1)
+			if (specular >= 0)
 			{
 				t_point *vec_r;
 				double	r_dot_v;
@@ -293,6 +293,8 @@ double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 		}
 		current = current->next;
 	}
+	if (need_free == 1)
+		free(vec_l);
 	return (intensity);
 }
 
@@ -347,9 +349,7 @@ int		trace_ray(t_tracer *tracer, t_point *origin, t_point *direction,
 	else if (closest_shape->type == PLANE)
 	{
 		t_point *shape_normal = create_point(0, 1, 0);
-		// normal = mult_k_vec(-1.0, shape_normal);
 		normal = shape_normal;
-
 	}
 	// for STEP 3
 	t_point *view = mult_k_vec(-1, direction);
@@ -361,18 +361,13 @@ int		trace_ray(t_tracer *tracer, t_point *origin, t_point *direction,
 	if (closest_shape->reflective <= 0 || depth <= 0)
 		return (local_color);
 
-	t_point *reflected_ray = reflect_ray(view, normal);
+	// ============================== COMPUTE REFLECTION ====================================
 
+	t_point *reflected_ray = reflect_ray(view, normal);
 	int		reflected_color = trace_ray(tracer, point, reflected_ray, EPSILON, INFINIT, depth - 1);
 
 	int tmp_color1 = mult_k_color(1 - closest_shape->reflective, local_color);
 	int tmp_color2 = mult_k_color(closest_shape->reflective, reflected_color);
-
-	free(closest_params);
-	free(point);
-	free(normal);
-	free(view);
-	free(reflected_ray);
 	return(tmp_color1 + tmp_color2);
 
 
@@ -397,6 +392,7 @@ void	render(t_tracer *tracer)
 		{
 			t_point *direction = canvas_to_viewport(x, y);
 			rotation_x(tracer);
+			// rotation_y(tracer);
 			direction = mult_vec_matrix(direction, tracer->camera_rotation);
 			color = trace_ray(tracer, tracer->camera_position, direction, 1.0, INFINIT, RECURSION_DEPTH);
 			put_pixel(tracer, x, y, color);
@@ -451,7 +447,10 @@ int main(int argc, char const **argv)
 	t_shape *test_sphere = create_shape(SPHERE, create_point(0, -1, 3), 1, 0xFF0000, 500, 0.2);
 	add_shape_to_list(&tracer->shapes, test_sphere);
 
-	t_shape *test_plane = create_shape(PLANE, create_point(0, -1, 0), 5, 0x00FF00, 500, 0.2);
+	// t_shape *test_sphere2 = create_shape(SPHERE, create_point(-3, -1, 3), 1, 0x0000FF, 500, 0.2);
+	// add_shape_to_list(&tracer->shapes, test_sphere2);
+
+	t_shape *test_plane = create_shape(PLANE, create_point(0, -1, 0), 5, 0x00FF00, 500, 0.5);
 	add_shape_to_list(&tracer->shapes, test_plane);
 
 
@@ -476,7 +475,7 @@ int main(int argc, char const **argv)
 	// add_light_to_list(&tracer->lights, a_light);
 	t_light *p_light = create_light(create_point(0, 4, 0), POINT, 0.6);
 	add_light_to_list(&tracer->lights, p_light);
-	// t_light *d_light = create_light(create_point(1, 4, 4), DIRECTIONAL, 0.2);
+	// t_light *d_light = create_light(create_point(1, 4, 4), DIRECTIONAL, 0.6);
 	// add_light_to_list(&tracer->lights, d_light);
 
 	// print_list_lights(tracer->lights);
