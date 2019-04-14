@@ -188,13 +188,13 @@ t_closest	*init_closest(void)
 	t_closest	*closest;
 
 	closest = (t_closest *)malloc(sizeof(t_closest));
-	closest->closest_t = INFINIT;
+	closest->closest_v = INFINIT;
 	closest->closest_shape = NULL;
 	return (closest);
 }
 
 t_closest	*closest_intersection(t_tracer *tracer, t_point *origin, t_point *direction,
-											double min_t, double max_t)
+											double min, double max)
 {
 	t_shape		*current_shape;
 	double		*ts;
@@ -208,14 +208,14 @@ t_closest	*closest_intersection(t_tracer *tracer, t_point *origin, t_point *dire
 			ts = intersect_ray_sphere(tracer, origin, direction, current_shape);
 		else if (current_shape->type == PLANE)
 			ts = intersect_ray_plane(tracer, origin, direction, current_shape);
-		if (ts[0] < closest_params->closest_t && min_t < ts[0] && ts[0] < max_t)
+		if (ts[0] < closest_params->closest_v && min < ts[0] && ts[0] < max)
 		{
-			closest_params->closest_t = ts[0];
+			closest_params->closest_v = ts[0];
 			closest_params->closest_shape = current_shape;
 		}
-		if (ts[1] < closest_params->closest_t && min_t < ts[1] && ts[1] < max_t)
+		if (ts[1] < closest_params->closest_v && min < ts[1] && ts[1] < max)
 		{
-			closest_params->closest_t = ts[1];
+			closest_params->closest_v = ts[1];
 			closest_params->closest_shape = current_shape;	
 		}
 		current_shape = current_shape->next;
@@ -223,6 +223,7 @@ t_closest	*closest_intersection(t_tracer *tracer, t_point *origin, t_point *dire
 	free(ts);
 	if (closest_params->closest_shape != NULL)
 		return (closest_params);
+	free(closest_params);
 	return (NULL);
 }
 
@@ -328,14 +329,14 @@ int		trace_ray(t_tracer *tracer, t_point *origin, t_point *direction,
 		return (BACKGROUND);
 
 	t_shape *closest_shape = closest_params->closest_shape;
-	double	closest_t = closest_params->closest_t;
+	double	closest_v = closest_params->closest_v;
 
 	// added in STEP 2
 	t_point		*point;
 	t_point		*normal;
 	double		lighting;
 
-	point = add_points(origin, mult_k_vec(closest_t, direction));
+	point = add_points(origin, mult_k_vec(closest_v, direction));
 
 	// normal for sphere
 	if (closest_shape->type == SPHERE)
@@ -346,7 +347,8 @@ int		trace_ray(t_tracer *tracer, t_point *origin, t_point *direction,
 	else if (closest_shape->type == PLANE)
 	{
 		t_point *shape_normal = create_point(0, 1, 0);
-		normal = mult_k_vec(-1.0, shape_normal);
+		// normal = mult_k_vec(-1.0, shape_normal);
+		normal = shape_normal;
 
 	}
 	// for STEP 3
@@ -355,7 +357,6 @@ int		trace_ray(t_tracer *tracer, t_point *origin, t_point *direction,
 	lighting = compute_lighting(tracer, point, normal, view, closest_shape->specular);
 
 	int local_color = mult_k_color(lighting, closest_shape->color);
-
 
 	if (closest_shape->reflective <= 0 || depth <= 0)
 		return (local_color);
@@ -473,7 +474,7 @@ int main(int argc, char const **argv)
 	// add light to scene
 	// t_light *a_light = create_light(create_point(0, 0, 0), AMBIENT, 0.2);
 	// add_light_to_list(&tracer->lights, a_light);
-	t_light *p_light = create_light(create_point(2, 4, 0), POINT, 0.6);
+	t_light *p_light = create_light(create_point(0, 4, 0), POINT, 0.6);
 	add_light_to_list(&tracer->lights, p_light);
 	// t_light *d_light = create_light(create_point(1, 4, 4), DIRECTIONAL, 0.2);
 	// add_light_to_list(&tracer->lights, d_light);

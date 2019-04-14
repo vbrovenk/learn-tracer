@@ -40,11 +40,11 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	@make -C libft/
-	@gcc $(OBJ) $(LIBFT) $(UBUNTU_FLAGS) -o $(NAME) -lpthread
+	@gcc $(OBJ) $(LIBFT) $(MLX_FLAGS) -o $(NAME) -lpthread
 	@echo "$(PURPLEBOLD)Tracer is ready"
 
 %.o: %.c $(INCLUDE)
-	@gcc -c $< -o $@ $(UBUNTU_FLAGS) -I $(LIBFT_INC)
+	@gcc -c $< -o $@  -I $(LIBFT_INC)
 
 clean:
 	@make clean -C libft/
