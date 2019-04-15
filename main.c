@@ -22,7 +22,7 @@ void	init_struct(t_tracer *tracer)
 	tracer->camera_position = NULL;
 	tracer->camera_rotation = NULL;
 
-	tracer->spheres = NULL;
+	tracer->shapes = NULL;
 	tracer->lights = NULL;
 
 	tracer->degrees_x = 0;
@@ -454,19 +454,6 @@ int main(int argc, char const **argv)
 	add_shape_to_list(&tracer->shapes, test_plane);
 
 
-	// CREATE SHERES
-	// t_sphere *r_sphere = init_sphere(create_point(0, -1, 3), 1, 0xFF0000, 500, 0.2);
-	// add_sphere_to_list(&tracer->spheres, r_sphere);
-	// t_sphere *b_sphere = init_sphere(create_point(2, 0, 4), 1, 0x0000FF, 500, 0.3);
-	// add_sphere_to_list(&tracer->spheres, b_sphere);
-	// t_sphere *g_sphere = init_sphere(create_point(-2, 0, 4), 1, 0x00FF00, 10, 0.4);
-	// add_sphere_to_list(&tracer->spheres, g_sphere);
-	// t_sphere *y_sphere = init_sphere(create_point(0, -5001, 0), 5000, 0xFFFF00, 1000, 0.5);
-	// add_sphere_to_list(&tracer->spheres, y_sphere);
-
-	// print_list_spheres(tracer->spheres);
-
-	// print_list_spheres(tracer->spheres);
 	tracer->camera_position = create_point(0, 0, 0);
 	init_rotation(tracer);
 

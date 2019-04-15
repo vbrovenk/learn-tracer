@@ -9,19 +9,6 @@ void	info_about_point(t_point *point)
 	printf("point->color = %d\n", point->color);
 }
 
-void	info_about_sphere(t_sphere *sphere)
-{
-	printf("=======================================\n");
-	printf("sphere->center->x = %f\n", sphere->center->x);
-	printf("sphere->center->y = %f\n", sphere->center->y);
-	printf("sphere->center->z = %f\n", sphere->center->z);
-	printf("shpere->radius = %f\n", sphere->radius);
-	printf("sphere->color = %d\n", sphere->color);
-	printf("sphere->specular = %f\n", sphere->specular);
-	printf("sphere->reflective = %f\n", sphere->reflective);
-
-}
-
 void	info_about_light(t_light *light)
 {
 	printf("=======================================\n");
@@ -30,19 +17,6 @@ void	info_about_light(t_light *light)
 	printf("light->position->z = %f\n", light->position->z);
 	printf("light->type = %d\n", light->type);
 	printf("light->intensity = %f\n", light->intensity);
-}
-
-
-void	print_list_spheres(t_sphere *head)
-{
-	t_sphere *current;
-
-	current = head;
-	while (current != NULL)
-	{
-		info_about_sphere(current);
-		current = current->next;
-	}
 }
 
 void	print_list_lights(t_light *head)

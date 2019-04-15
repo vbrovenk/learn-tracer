@@ -18,23 +18,6 @@ t_shape *create_shape(int type, t_point *center, double radius, int color,
 	return (shape);
 }
 
-
-t_sphere *init_sphere(t_point *center, double radius, int color,
-										double specular, double reflective)
-{
-	t_sphere *sphere;
-
-	sphere = (t_sphere *)malloc(sizeof(t_sphere));
-	sphere->center = center;
-	sphere->radius = radius;
-	sphere->color = color;
-
-	sphere->specular = specular;
-	sphere->reflective = reflective;
-	sphere->next = NULL;
-	return (sphere);
-}
-
 t_light	*create_light(t_point *position, int type, double intensity)
 {
 	t_light *new_light;
@@ -62,23 +45,6 @@ void	add_shape_to_list(t_shape **head, t_shape *shape)
 		while (current->next != NULL)
 			current = current->next;
 		current->next = shape;
-	}
-}
-
-void	add_sphere_to_list(t_sphere **head, t_sphere *sphere)
-{
-	t_sphere *current;
-
-	current = *head;
-	if (current == NULL)
-	{
-		*head = sphere;
-	}
-	else
-	{
-		while (current->next != NULL)
-			current = current->next;
-		current->next = sphere;
 	}
 }
 
