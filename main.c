@@ -210,13 +210,15 @@ double *intersect_ray_cylinder(t_tracer *tracer, t_point *origin, t_point *direc
 	coeff[0] = dot_product(direction, direction) - value * value;
 	coeff[1] = 2.0 * (dot_product(direction, oc) - value * dot_product(oc, n));
 	coeff[2] = dot_product(oc, oc) - pow(dot_product(oc, n), 2.0) - pow(shape->radius, 2.0);
+	free(oc);
+	free(n);
 
 	discriminant = sqrt(coeff[1] * coeff[1] - 4.0 * coeff[0] * coeff[2]);
 	if (discriminant < 0)
 	{
 		res[0] = INFINIT;
 		res[1] = INFINIT;
-		free(n);
+		
 		return (res);
 	}
 	res[0] = (-coeff[1] + discriminant) / (2.0 * coeff[0]);
@@ -228,7 +230,55 @@ double *intersect_ray_cylinder(t_tracer *tracer, t_point *origin, t_point *direc
 		res[0] = cut_cylinder(origin, shape, value, res[0]);
 		res[1] = cut_cylinder(origin, shape, value, res[1]);
 	}
+	return (res);
+}
+
+double	cut_cone(t_point *origin, t_shape *shape, double value, double res)
+{
+	t_point *temp;
+	double m;
+
+	t_point *n = create_point(0, 1, 0); // normal
+	temp = subtract_points(origin, shape->center);
+	m = value * res + dot_product(temp, n);
+	free(temp);
 	free(n);
+	if (m < -shape->height_cone2 || m > shape->height_cone1)
+		return (INFINIT);
+	return (res);
+}
+
+double *intersect_ray_cone(t_tracer *tracer, t_point *origin, t_point *direction, t_shape *shape)
+{
+	double	coeff[3];
+	double	discriminant;
+	t_point	*oc;
+	double	value[2];
+	double *res;
+
+	res = malloc(sizeof(double) * 2);
+
+	t_point *n = create_point(0, 1, 0); // normal
+	value[0] = dot_product(direction, n);
+	value[1] = 1 + shape->angle * shape->angle;
+	oc = subtract_points(origin, shape->center);
+	coeff[0] = dot_product(direction, direction) - value[1] * value[0] * value[0];
+	coeff[1] = 2 * (dot_product(direction, oc) - value[1] * value[0] * dot_product(oc, n));
+	coeff[2] = dot_product(oc, oc) - value[1] * pow(dot_product(oc, n), 2.0);
+	free(oc);
+	free(n);
+
+	discriminant = sqrt(coeff[1] * coeff[1] - 4 * coeff[0] * coeff[2]);
+	if (discriminant < 0)
+	{
+		res[0] = INFINIT;
+		res[1] = INFINIT;
+		return (res);
+	}
+	res[0] = (-coeff[1] + discriminant) / (2.0 * coeff[0]);
+	res[1] = (-coeff[1] - discriminant) / (2.0 * coeff[0]);
+	res[0] = cut_cone(origin, shape, value[0], res[0]);
+	res[1] = cut_cone(origin, shape, value[0], res[1]);
 	return (res);
 }
 
@@ -260,6 +310,9 @@ t_closest	*closest_intersection(t_tracer *tracer, t_point *origin, t_point *dire
 			ts = intersect_ray_plane(tracer, origin, direction, current_shape);
 		else if (current_shape->type == CYLINDER)
 			ts = intersect_ray_cylinder(tracer, origin, direction, current_shape);
+		else if (current_shape->type == CONE)
+			ts = intersect_ray_cone(tracer, origin, direction, current_shape);
+
 		if (ts[0] < closest_params->closest_v && min < ts[0] && ts[0] < max)
 		{
 			closest_params->closest_v = ts[0];
@@ -418,6 +471,22 @@ int		trace_ray(t_tracer *tracer, t_point *origin, t_point *direction,
 		free(temp);
 		temp = subtract_points(point, closest_shape->center);
 		normal = subtract_points(temp, mult_k_vec(m, shape_normal));
+		free(shape_normal);
+	}
+	else if (closest_shape->type == CONE)
+	{
+		t_point *shape_normal = create_point(0, 1, 0);
+		double m;
+		t_point *temp;
+
+		temp = subtract_points(origin, closest_shape->center);
+		m = dot_product(direction, shape_normal) * closest_v + dot_product(temp, shape_normal);
+		free(temp);
+		temp = subtract_points(point, closest_shape->center);
+		normal = subtract_points(temp, mult_k_vec(1 + pow(closest_shape->angle, 2.0),
+													mult_k_vec(m, shape_normal)));
+		free(temp);
+		free(shape_normal);
 	}
 	// for STEP 3
 	t_point *view = mult_k_vec(-1, direction);
@@ -512,8 +581,8 @@ int main(int argc, char const **argv)
 
 
 	// CREATE SHAPES
-	// t_shape *test_sphere = create_shape(SPHERE, create_point(1, 2, 3), 1, 0xFF0000, 0, 500, 0.2);
-	// add_shape_to_list(&tracer->shapes, test_sphere);
+	t_shape *test_sphere = create_shape(SPHERE, create_point(-2, 2, 3), 1, 0xFF0000, 0, 500, 0.2);
+	add_shape_to_list(&tracer->shapes, test_sphere);
 
 	// t_shape *test_sphere2 = create_shape(SPHERE, create_point(-3, -1, 3), 1, 0x0000FF, 500, 0.2);
 	// add_shape_to_list(&tracer->shapes, test_sphere2);
@@ -524,6 +593,8 @@ int main(int argc, char const **argv)
 	// t_shape *test_cylinder = create_shape(CYLINDER, create_point(1, 2, 3), 1, 0xFF00000, 3, 500, 0.5);
 	// add_shape_to_list(&tracer->shapes, test_cylinder);
 
+	t_shape *test_cone = create_cone(CONE, create_point(1, 2, 3), 1, 0xFF0F000, 0, 15, 0, 7 ,500, 0.5);
+	add_shape_to_list(&tracer->shapes, test_cone);
 
 	tracer->camera_position = create_point(0, 0, 0);
 	init_rotation(tracer);

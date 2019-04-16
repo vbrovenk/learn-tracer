@@ -27,6 +27,9 @@ void	info_about_shape(t_shape *shape)
 	printf("shape->radius = %f\n", shape->radius);
 	printf("shape->color = %d\n", shape->color);
 	printf("shape->height_cylinder = %f\n", shape->height_cylinder);
+	printf("shape->angle = %f\n", shape->angle);
+	printf("shape->height_cone1 = %f\n", shape->height_cone1);
+	printf("shape->height_cone2 = %f\n", shape->height_cone2);
 	printf("shape->specular = %f\n", shape->specular);
 	printf("shape->reflective = %f\n", shape->reflective);
 }

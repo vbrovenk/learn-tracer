@@ -20,6 +20,32 @@ t_shape *create_shape(int type, t_point *center, double radius, int color, doubl
 	return (shape);
 }
 
+t_shape *create_cone(int type, t_point *center, double radius, int color, double height_cylinder,
+						double angle, double height_cone1, double height_cone2,
+										double specular, double reflective)
+{
+	t_shape *shape;
+
+	shape = (t_shape *)malloc(sizeof(t_shape));
+	shape->type = type;
+
+	shape->center = center;
+	shape->radius = radius;
+	shape->color = color;
+
+	shape->height_cylinder = height_cylinder;
+
+	// for cone
+	shape->angle = tan(deg_to_rad(60));
+	shape->height_cone1 = height_cone1;
+	shape->height_cone2 = height_cone2;
+
+	shape->specular = specular;
+	shape->reflective = reflective;
+	shape->next = NULL;
+	return (shape);
+}
+
 t_light	*create_light(t_point *position, int type, double intensity)
 {
 	t_light *new_light;

@@ -20,7 +20,7 @@
 
 # define WIDTH 420
 # define HEIGHT 420
-# define BACKGROUND 0x000000
+# define BACKGROUND 0x000010
 
 # define MIN_T 1
 # define INFINIT 2147483647
@@ -47,6 +47,7 @@
 # define PLANE 20
 # define SPHERE 21
 # define CYLINDER 22
+# define CONE 23
 
 /*
 ** Ubuntu buttons
@@ -107,6 +108,11 @@ typedef struct s_shape
 
 	double	height_cylinder;
 
+	// for cone
+	double	angle;
+	double height_cone1;
+	double height_cone2;
+
 	double	specular;
 	double	reflective;
 
@@ -161,6 +167,7 @@ typedef	struct s_closest
 */
 void	render(t_tracer *tracer);
 void	start_threads(t_tracer *tracer);
+double	deg_to_rad(double degrees);
 
 /*
 ** actions_with_points.c
@@ -190,6 +197,10 @@ void	rotation_y(t_tracer *tracer);
 */
 t_shape *create_shape(int type, t_point *center, double radius, int color, double height_cylinder,
 										double specular, double reflective);
+t_shape *create_cone(int type, t_point *center, double radius, int color, double height_cylinder,
+						double angle, double height_cone1, double height_cone2,
+										double specular, double reflective);
+
 t_light	*create_light(t_point *position, int type, double intensity);
 void	add_shape_to_list(t_shape **head, t_shape *shape);
 void	add_light_to_list(t_light **head, t_light *light);
