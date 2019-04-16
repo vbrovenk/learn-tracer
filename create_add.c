@@ -1,6 +1,6 @@
 #include "raytray.h"
 
-t_shape *create_shape(int type, t_point *center, double radius, int color,
+t_shape *create_shape(int type, t_point *center, double radius, int color, double height_cylinder,
 										double specular, double reflective)
 {
 	t_shape *shape;
@@ -11,6 +11,8 @@ t_shape *create_shape(int type, t_point *center, double radius, int color,
 	shape->center = center;
 	shape->radius = radius;
 	shape->color = color;
+
+	shape->height_cylinder = height_cylinder;
 
 	shape->specular = specular;
 	shape->reflective = reflective;

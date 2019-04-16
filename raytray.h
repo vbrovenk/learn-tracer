@@ -18,8 +18,8 @@
 #include "libft.h"
 #include <mlx.h>
 
-# define WIDTH 520
-# define HEIGHT 520
+# define WIDTH 420
+# define HEIGHT 420
 # define BACKGROUND 0x000000
 
 # define MIN_T 1
@@ -31,7 +31,7 @@
 # define PROJECTION_PLANE_Z 1
 # define FOV 60
 
-# define THREADS 8
+# define THREADS 4
 
 /*
 ** For light
@@ -46,40 +46,41 @@
 
 # define PLANE 20
 # define SPHERE 21
+# define CYLINDER 22
 
 /*
 ** Ubuntu buttons
 */
-// # define ARROW_UP 65362
-// # define ARROW_DOWN 65364
-// # define ARROW_LEFT 65361
-// # define ARROW_RIGHT 65363
-// # define KEY_W 119
-// # define KEY_S 115
-// # define KEY_A 97
-// # define KEY_D 100
+# define ARROW_UP 65362
+# define ARROW_DOWN 65364
+# define ARROW_LEFT 65361
+# define ARROW_RIGHT 65363
+# define KEY_W 119
+# define KEY_S 115
+# define KEY_A 97
+# define KEY_D 100
 
-// # define NUM_8 65431
-// # define NUM_2 65433
+# define NUM_8 65431
+# define NUM_2 65433
 
-// # define ESC 65307
+# define ESC 65307
 
 /*
 ** MAC buttons
 */
-# define ARROW_UP 126
-# define ARROW_DOWN 125
-# define ARROW_LEFT 123
-# define ARROW_RIGHT 124
-# define KEY_W 13
-# define KEY_S 1
-# define KEY_A 0
-# define KEY_D 2
+// # define ARROW_UP 126
+// # define ARROW_DOWN 125
+// # define ARROW_LEFT 123
+// # define ARROW_RIGHT 124
+// # define KEY_W 13
+// # define KEY_S 1
+// # define KEY_A 0
+// # define KEY_D 2
 
-# define NUM_8 91
-# define NUM_2 84
+// # define NUM_8 91
+// # define NUM_2 84
 
-# define ESC 53
+// # define ESC 53
 
 typedef struct s_point
 {
@@ -103,6 +104,8 @@ typedef struct s_shape
 	t_point	*center;
 	double	radius;
 	int		color;
+
+	double	height_cylinder;
 
 	double	specular;
 	double	reflective;
@@ -185,7 +188,7 @@ void	rotation_y(t_tracer *tracer);
 /*
 ** create_add.c
 */
-t_shape *create_shape(int type, t_point *center, double radius, int color,
+t_shape *create_shape(int type, t_point *center, double radius, int color, double height_cylinder,
 										double specular, double reflective);
 t_light	*create_light(t_point *position, int type, double intensity);
 void	add_shape_to_list(t_shape **head, t_shape *shape);
@@ -197,6 +200,7 @@ void	add_light_to_list(t_light **head, t_light *light);
 void	info_about_point(t_point *point);
 void	info_about_light(t_light *light);
 void	print_list_lights(t_light *head);
+void	print_list_shapes(t_shape *head);
 void	info_about_matrix4x4(double (*matrix)[4]);
 
 

@@ -2,7 +2,7 @@
 
 void	info_about_point(t_point *point)
 {
-	printf("=======================================\n");
+	printf("================ POINT =======================\n");
 	printf("point->x = %f\n", point->x);
 	printf("point->y = %f\n", point->y);
 	printf("point->z = %f\n", point->z);
@@ -11,12 +11,24 @@ void	info_about_point(t_point *point)
 
 void	info_about_light(t_light *light)
 {
-	printf("=======================================\n");
+	printf("================= LIGHT ======================\n");
 	printf("light->position->x = %f\n", light->position->x);
 	printf("light->position->y = %f\n", light->position->y);
 	printf("light->position->z = %f\n", light->position->z);
 	printf("light->type = %d\n", light->type);
 	printf("light->intensity = %f\n", light->intensity);
+}
+
+void	info_about_shape(t_shape *shape)
+{
+	printf("================== SHAPE =====================\n");
+	printf("shape->type = %d\n", shape->type);
+	printf("shape->center = %f | %f | %f\n", shape->center->x, shape->center->y, shape->center->z);
+	printf("shape->radius = %f\n", shape->radius);
+	printf("shape->color = %d\n", shape->color);
+	printf("shape->height_cylinder = %f\n", shape->height_cylinder);
+	printf("shape->specular = %f\n", shape->specular);
+	printf("shape->reflective = %f\n", shape->reflective);
 }
 
 void	print_list_lights(t_light *head)
@@ -30,6 +42,19 @@ void	print_list_lights(t_light *head)
 		current = current->next;
 	}
 }
+
+void	print_list_shapes(t_shape *head)
+{
+	t_shape *current;
+
+	current = head;
+	while (current != NULL)
+	{
+		info_about_shape(current);
+		current = current->next;
+	}
+}
+
 
 void	info_about_matrix4x4(double (*matrix)[4])
 {
