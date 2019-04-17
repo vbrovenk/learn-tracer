@@ -30,6 +30,7 @@ void	info_about_shape(t_shape *shape)
 	printf("shape->angle = %f\n", shape->angle);
 	printf("shape->height_cone1 = %f\n", shape->height_cone1);
 	printf("shape->height_cone2 = %f\n", shape->height_cone2);
+	printf("shape->normal = %f | %f | %f\n", shape->normal->x, shape->normal->y, shape->normal->z);
 	printf("shape->specular = %f\n", shape->specular);
 	printf("shape->reflective = %f\n", shape->reflective);
 }

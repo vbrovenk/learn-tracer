@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME = tracer
+NAME = RTv1
 INCLUDE = raytray.h
 LIBFT_INC = ./libft/includes/
 LIBFT = libft/libft.a
@@ -21,7 +21,8 @@ SRC =	main.c \
 		actions_with_matrix.c \
 		rotation.c \
 		create_add.c \
-		print.c
+		print.c \
+		errors.c
 		
 OBJ = $(SRC:.c=.o)
 CFLAGS = -Wall -Wextra -Werror
@@ -40,11 +41,11 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	@make -C libft/
-	@gcc $(OBJ) $(LIBFT) $(UBUNTU_FLAGS) -o $(NAME) -lpthread
+	@gcc $(OBJ) $(LIBFT) $(MLX_FLAGS) -o $(NAME)
 	@echo "$(PURPLEBOLD)Tracer is ready"
 
 %.o: %.c $(INCLUDE)
-	@gcc -c $< -o $@  -I $(LIBFT_INC) $(UBUNTU_FLAGS)
+	@gcc -c $< -o $@  -I $(LIBFT_INC)
 
 clean:
 	@make clean -C libft/

@@ -16,7 +16,8 @@ t_point *create_point(double x, double y, double z)
 {
 	t_point *new;
 
-	new = (t_point *)malloc(sizeof(t_point));
+	if ((new = (t_point *)malloc(sizeof(t_point))) == NULL)
+		print_error("Can't malloc memory for t_point");
 	new->x = x;
 	new->y = y;
 	new->z = z;

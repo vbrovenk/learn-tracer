@@ -1,7 +1,7 @@
 #include "raytray.h"
 
 t_shape *create_shape(int type, t_point *center, double radius, int color, double height_cylinder,
-										double specular, double reflective)
+										t_point *normal, double specular, double reflective)
 {
 	t_shape *shape;
 
@@ -13,6 +13,12 @@ t_shape *create_shape(int type, t_point *center, double radius, int color, doubl
 	shape->color = color;
 
 	shape->height_cylinder = height_cylinder;
+	shape->angle = 0;
+	shape->height_cone1 = 0;
+	shape->height_cone2 = 0;
+
+	shape->normal = normalize(normal);
+	free(normal);
 
 	shape->specular = specular;
 	shape->reflective = reflective;
@@ -22,7 +28,7 @@ t_shape *create_shape(int type, t_point *center, double radius, int color, doubl
 
 t_shape *create_cone(int type, t_point *center, double radius, int color, double height_cylinder,
 						double angle, double height_cone1, double height_cone2,
-										double specular, double reflective)
+							t_point *normal, double specular, double reflective)
 {
 	t_shape *shape;
 
@@ -36,9 +42,12 @@ t_shape *create_cone(int type, t_point *center, double radius, int color, double
 	shape->height_cylinder = height_cylinder;
 
 	// for cone
-	shape->angle = tan(deg_to_rad(60));
+	shape->angle = tan(deg_to_rad(angle));
 	shape->height_cone1 = height_cone1;
 	shape->height_cone2 = height_cone2;
+
+	shape->normal = normalize(normal);
+	free(normal);
 
 	shape->specular = specular;
 	shape->reflective = reflective;
