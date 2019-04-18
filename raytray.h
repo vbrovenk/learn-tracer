@@ -14,7 +14,7 @@
 #define RAYTRAY_H
 
 #include <math.h>
-#include <stdio.h>
+#include <stdio.h> // delete
 #include "libft.h"
 #include <mlx.h>
 
@@ -113,8 +113,7 @@ typedef struct s_shape
 	double height_cone1;
 	double height_cone2;
 
-	// normal or direction ?
-	t_point *normal;
+	t_point *dir;
 
 	double	specular;
 	double	reflective;
@@ -199,10 +198,10 @@ void	rotation_y(t_tracer *tracer);
 ** create_add.c
 */
 t_shape *create_shape(int type, t_point *center, double radius, int color, double height_cylinder,
-										t_point *normal, double specular, double reflective);
+										t_point *dir, double specular, double reflective);
 t_shape *create_cone(int type, t_point *center, double radius, int color, double height_cylinder,
 						double angle, double height_cone1, double height_cone2,
-							t_point *normal, double specular, double reflective);
+							t_point *dir, double specular, double reflective);
 
 t_light	*create_light(t_point *position, int type, double intensity);
 void	add_shape_to_list(t_shape **head, t_shape *shape);
