@@ -17,9 +17,10 @@
 #include <stdio.h> // delete
 #include "libft.h"
 #include <mlx.h>
+#include <fcntl.h>
 
-# define WIDTH 520
-# define HEIGHT 520
+# define WIDTH 420
+# define HEIGHT 420
 # define BACKGROUND 0x000010
 
 # define MIN_T 1
@@ -31,7 +32,7 @@
 # define PROJECTION_PLANE_Z 1
 # define FOV 60
 
-# define THREADS 8
+# define THREADS 4
 
 /*
 ** For light
@@ -52,36 +53,36 @@
 /*
 ** Ubuntu buttons
 */
-// # define ARROW_UP 65362
-// # define ARROW_DOWN 65364
-// # define ARROW_LEFT 65361
-// # define ARROW_RIGHT 65363
-// # define KEY_W 119
-// # define KEY_S 115
-// # define KEY_A 97
-// # define KEY_D 100
+# define ARROW_UP 65362
+# define ARROW_DOWN 65364
+# define ARROW_LEFT 65361
+# define ARROW_RIGHT 65363
+# define KEY_W 119
+# define KEY_S 115
+# define KEY_A 97
+# define KEY_D 100
 
-// # define NUM_8 65431
-// # define NUM_2 65433
+# define NUM_8 65431
+# define NUM_2 65433
 
-// # define ESC 65307
+# define ESC 65307
 
 /*
 ** MAC buttons
 */
-# define ARROW_UP 126
-# define ARROW_DOWN 125
-# define ARROW_LEFT 123
-# define ARROW_RIGHT 124
-# define KEY_W 13
-# define KEY_S 1
-# define KEY_A 0
-# define KEY_D 2
+// # define ARROW_UP 126
+// # define ARROW_DOWN 125
+// # define ARROW_LEFT 123
+// # define ARROW_RIGHT 124
+// # define KEY_W 13
+// # define KEY_S 1
+// # define KEY_A 0
+// # define KEY_D 2
 
-# define NUM_8 91
-# define NUM_2 84
+// # define NUM_8 91
+// # define NUM_2 84
 
-# define ESC 53
+// # define ESC 53
 
 typedef struct s_point
 {
@@ -197,8 +198,8 @@ void	rotation_y(t_tracer *tracer);
 /*
 ** create_add.c
 */
-t_shape *create_shape(int type, t_point *center, double radius, int color, double height_cylinder,
-										t_point *dir, double specular, double reflective);
+// t_shape *create_shape(int type, t_point *center, double radius, int color, double height_cylinder,
+// 										t_point *dir, double specular, double reflective);
 t_shape *create_cone(int type, t_point *center, double radius, int color, double height_cylinder,
 						double angle, double height_cone1, double height_cone2,
 							t_point *dir, double specular, double reflective);
@@ -220,5 +221,11 @@ void	info_about_matrix4x4(double (*matrix)[4]);
 ** errors.c
 */
 void	print_error(char *msg);
+
+/*
+** scan_data.c
+*/
+void	read_data(t_tracer *tracer, char *filename);
+
 
 #endif

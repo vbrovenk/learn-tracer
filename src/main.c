@@ -571,9 +571,17 @@ void	start_threads(t_tracer *tracer)
 }
 
 // compilation without FLAGS
-int main(int argc, char const **argv)
+int main(int argc, char *argv[])
 {
 	t_tracer	*tracer;
+
+	if (argc != 2)
+		print_error("Usage: ./RTv1 scene.txt");
+	if (ft_strlen(argv[1]) < 5 || ft_strrchr(argv[1], '.') == NULL)
+		print_error("Wrong file");
+	char *extension = ft_strrchr(argv[1], '.');
+	if (ft_strequ(extension, ".txt") == 0)
+		print_error("Wrong extension of file");
 
 	tracer = (t_tracer*)malloc(sizeof(t_tracer));
 	init_struct(tracer);
@@ -585,16 +593,16 @@ int main(int argc, char const **argv)
 
 
 	// CREATE SHAPES
-	t_shape *test_sphere = create_shape(SPHERE, create_point(1, 2, 3), 1, 0xFF0000, 0,
-																create_point(0, 0, 0), 500, 0.2);
-	add_shape_to_list(&tracer->shapes, test_sphere);
+	// t_shape *test_sphere = create_shape(SPHERE, create_point(1, 2, 3), 1, 0xFF0000, 0,
+																// create_point(0, 0, 0), 500, 0.2);
+	// add_shape_to_list(&tracer->shapes, test_sphere);
 
 	// t_shape *test_sphere2 = create_shape(SPHERE, create_point(-3, -1, 3), 1, 0x0000FF, 500, 0.2);
 	// add_shape_to_list(&tracer->shapes, test_sphere2);
 
-	t_shape *test_plane = create_shape(PLANE, create_point(0, -2, 9), 0, 0x00FF00, 0,
-																create_point(0, 1, 0), 500, 0.5);
-	add_shape_to_list(&tracer->shapes, test_plane);
+	// t_shape *test_plane = create_shape(PLANE, create_point(0, -2, 9), 0, 0x00FF00, 0,
+																// create_point(0, 1, 0), 500, 0.5);
+	// add_shape_to_list(&tracer->shapes, test_plane);
 
 	// t_shape *test_cylinder = create_shape(CYLINDER, create_point(1, 2, 3), 1, 0xFF00000, 3,
 																// create_point(1, 1, 0), 500, 0.5);
@@ -604,15 +612,21 @@ int main(int argc, char const **argv)
 															// create_point(1, 1, 0), 500, 0.5);
 	// add_shape_to_list(&tracer->shapes, test_cone);
 
-	tracer->camera_position = create_point(0, 0, 0);
+
+	// ====================== READ DATA ========================
+	// tracer->camera_position = create_point(0, 0, 0);
+
+	read_data(tracer, argv[1]);
+	if (tracer->camera_position == NULL)
+		print_error("Error with reading from file");
 	init_rotation(tracer);
 
 	// add light to scene
 	// t_light *a_light = create_light(create_point(0, 0, 0), AMBIENT, 0.2);
 	// add_light_to_list(&tracer->lights, a_light);
-	t_light *p_light = create_light(create_point(5, 5, -4), POINT, 0.7);
-	add_light_to_list(&tracer->lights, p_light);
-	// t_light *d_light = create_light(create_point(1, 4, 4), DIRECTIONAL, 0.6);
+	// t_light *p_light = create_light(create_point(5, 5, -4), POINT, 0.7);
+	// add_light_to_list(&tracer->lights, p_light);
+	// t_light *d_light = create_light(create_point(5, 5, -3), DIRECTIONAL, 0.6);
 	// add_light_to_list(&tracer->lights, d_light);
 
 	// print_list_lights(tracer->lights);

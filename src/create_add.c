@@ -1,30 +1,30 @@
 #include "raytray.h"
 
-t_shape *create_shape(int type, t_point *center, double radius, int color, double height_cylinder,
-										t_point *dir, double specular, double reflective)
-{
-	t_shape *shape;
+// t_shape *create_shape(int type, t_point *center, double radius, int color, double height_cylinder,
+// 										t_point *dir, double specular, double reflective)
+// {
+// 	t_shape *shape;
 
-	shape = (t_shape *)malloc(sizeof(t_shape));
-	shape->type = type;
+// 	shape = (t_shape *)malloc(sizeof(t_shape));
+// 	shape->type = type;
 
-	shape->center = center;
-	shape->radius = radius;
-	shape->color = color;
+// 	shape->center = center;
+// 	shape->radius = radius;
+// 	shape->color = color;
 
-	shape->height_cylinder = height_cylinder;
-	shape->angle = 0;
-	shape->height_cone1 = 0;
-	shape->height_cone2 = 0;
+// 	shape->height_cylinder = height_cylinder;
+// 	shape->angle = 0;
+// 	shape->height_cone1 = 0;
+// 	shape->height_cone2 = 0;
 
-	shape->dir = normalize(dir);
-	free(dir);
+// 	shape->dir = normalize(dir);
+// 	free(dir);
 
-	shape->specular = specular;
-	shape->reflective = reflective;
-	shape->next = NULL;
-	return (shape);
-}
+// 	shape->specular = specular;
+// 	shape->reflective = reflective;
+// 	shape->next = NULL;
+// 	return (shape);
+// }
 
 t_shape *create_cone(int type, t_point *center, double radius, int color, double height_cylinder,
 						double angle, double height_cone1, double height_cone2,
