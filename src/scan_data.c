@@ -23,6 +23,45 @@ void	clear_split(char **split)
 	free(split);
 }
 
+double	read_double(char *line)
+{
+	double nbr;
+	char *point;
+	int minus;
+	char *trim;
+	int i;
+
+	i = 0;
+	trim = ft_strtrim(line);
+	minus = 1;
+	if (trim[0] == '-')
+	{
+		minus = -1;
+		i += 1;
+	}
+	nbr = ft_atoi(&trim[i]);
+	point = ft_strchr(&trim[i], '.');
+	if (point != NULL)
+		nbr += ft_atoi(point + 1) / pow(10, ft_strlen(point + 1));
+	ft_strdel(&trim);
+	printf("nbr = %f\n", nbr * minus);
+	return (nbr * minus);
+}
+
+// void	read_position(char *line, t_point *point)
+// {
+// 	char **split;
+
+// 	split = ft_strsplit(line, ',');
+// 	if (count_splits(split) == 3)
+// 	{
+// 		point->x = read_double(split[0]);
+// 		point->y = read_double(split[1]);
+// 		point->z = read_double(split[0]);
+// 	}
+// 	clear_split(split);
+// }
+
 void	read_position(char *line, t_point *point)
 {
 	char **split;
@@ -47,8 +86,6 @@ void	read_position(char *line, t_point *point)
 		point->z = ft_atoi(temp);
 		free(temp);
 	}
-	else
-		print_error("Error with position");
 	clear_split(split);
 }
 
@@ -63,6 +100,7 @@ void	read_camera(t_tracer *tracer, int fd)
 	if (ft_strnequ(line, "position: ", 10) == 0)
 		print_error("Error with position");
 	read_position(line + 10, tracer->camera_position);
+	ft_strdel(&line);
 }
 
 double	read_intensity(char *line)
@@ -90,14 +128,15 @@ void	read_light(t_tracer *tracer, int fd)
 	p_light = create_light(create_point(0, 0, 0), POINT, 0.5);
 	get_next_line(fd, &line);
 	if (ft_strnequ(line, "position: ", 10) == 0)
-		print_error("Error with position");
+		print_error("Error with light's position");
 	read_position(line + 10, p_light->position);
 	ft_strdel(&line);
 	get_next_line(fd, &line);
 	if (ft_strnequ(line, "intensity: ", 11) == 0)
-		print_error("Error with intensity");
+		print_error("Error with light's intensity");
 	p_light->intensity = read_intensity(line + 11);
 	add_light_to_list(&tracer->lights, p_light);
+	ft_strdel(&line);	
 }
 
 t_shape	*create_shape(int type)
@@ -106,7 +145,7 @@ t_shape	*create_shape(int type)
 
 	shape = (t_shape *)malloc(sizeof(t_shape));
 	shape->type = type;
-	shape->center = create_point(1, 1, 1);
+	shape->center = create_point(0, 0, 3);
 	shape->radius = 1.0;
 	shape->color = 0x00FF00;
 	shape->height_cylinder = INFINIT;
@@ -144,18 +183,6 @@ int		is_number(char *line)
 	return (1);
 }
 
-double	read_double(char *line)
-{
-	double nbr;
-	char *point;
-
-	nbr = ft_atoi(line);
-	point = ft_strchr(line, '.');
-	if (point != NULL)
-		nbr += ft_atoi(point + 1) / pow(10, ft_strlen(point + 1));
-	return (nbr);
-}
-
 int		read_color(char *line)
 {
 	char **split;
@@ -187,7 +214,23 @@ int		general_options(char *line, t_shape *shape)
 	if (ft_strnequ(line, "position: ", 10) == 1)
 		read_position(line + 10, shape->center);
 	else if (ft_strnequ(line, "color: ", 7) == 1)
+	{
 		shape->color = read_color(line + 7);
+		if (shape->color == 0)
+			shape->color = 0x00FF00;
+	}
+	else if (ft_strnequ(line, "specular: ", 10) == 1)
+	{
+		shape->specular = read_double(line + 10);
+		if (shape->specular < 0)
+			shape->specular = 100;
+	}
+	else if (ft_strnequ(line, "radius: ", 8) == 1)
+	{
+		shape->radius = read_double(line + 8);
+		if(is_number(line + 8) == 0 || shape->radius < 0)
+			shape->radius = 1.0;
+	}
 	else
 		return (0);
 	return (1);
@@ -204,12 +247,6 @@ void	read_sphere(t_tracer *tracer, int fd)
 	{
 		if (general_options(line, shape) == 1)
 			;
-		else if (ft_strnequ(line, "radius: ", 8) == 1)
-		{
-			shape->radius = read_double(line + 8);
-			if(is_number(line + 8) == 0 || shape->radius < 0)
-				shape->radius = 1.0;
-		}
 		else
 			break ;
 		ft_strdel(&line);
@@ -218,7 +255,7 @@ void	read_sphere(t_tracer *tracer, int fd)
 	add_shape_to_list(&tracer->shapes, shape);
 }
 
-void	read_direction(char *line, t_point *direction)
+void	read_direction_plane(char *line, t_point *direction)
 {
 	char **split;
 	t_point *norm;
@@ -244,6 +281,26 @@ void	read_direction(char *line, t_point *direction)
 	clear_split(split);
 }
 
+void	read_direction(char *line, t_point *direction)
+{
+	char **split;
+	t_point *norm;
+
+	split = ft_strsplit(line, ',');
+	if (count_splits(split) == 3)
+	{
+		direction->x = read_double(split[0]);
+		direction->y = read_double(split[1]);
+		direction->z = read_double(split[2]);
+	}
+	norm = normalize(direction);
+	direction->x = norm->x;
+	direction->y = norm->y;
+	direction->z = norm->z;
+	free(norm);
+	clear_split(split);
+}
+
 void	read_plane(t_tracer *tracer, int fd)
 {
 	t_shape *shape;
@@ -256,7 +313,7 @@ void	read_plane(t_tracer *tracer, int fd)
 		if (general_options(line, shape) == 1)
 			;
 		else if (ft_strnequ(line, "direction: ", 11))
-			read_direction(line + 10, shape->dir);
+			read_direction_plane(line + 11, shape->dir);
 		else
 			break ;
 		ft_strdel(&line);
@@ -277,7 +334,7 @@ void	read_cylinder(t_tracer *tracer, int fd)
 		if (general_options(line, shape) == 1)
 			;
 		else if (ft_strnequ(line, "direction: ", 11))
-			read_direction(line + 10, shape->dir);
+			read_direction(line + 11, shape->dir);
 		else if (ft_strnequ(line, "height: ", 8) == 1)
 		{
 			shape->height_cylinder = read_double(line + 8);
@@ -304,7 +361,7 @@ void	read_cone(t_tracer *tracer, int fd)
 		if (general_options(line, shape) == 1)
 			;
 		else if (ft_strnequ(line, "direction: ", 11))
-			read_direction(line + 10, shape->dir);
+			read_direction(line + 11, shape->dir);
 		else if (ft_strnequ(line, "height1: ", 9) == 1)
 		{
 			shape->height_cone1 = read_double(line + 9);

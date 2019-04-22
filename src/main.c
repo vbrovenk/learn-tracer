@@ -366,6 +366,7 @@ double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 			if (blocker != NULL)
 			{
 				free(blocker);
+				free(vec_l);
 				current = current->next;
 				continue;
 			}
@@ -389,10 +390,9 @@ double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 				free(vec_r);
 			}
 		}
+		free(vec_l);
 		current = current->next;
 	}
-	if (need_free == 1)
-		free(vec_l);
 	return (intensity);
 }
 
@@ -618,7 +618,7 @@ int main(int argc, char *argv[])
 
 	read_data(tracer, argv[1]);
 	if (tracer->camera_position == NULL)
-		print_error("Error with reading from file");
+		print_error("Camera must be set");
 	init_rotation(tracer);
 
 	// add light to scene
@@ -626,6 +626,8 @@ int main(int argc, char *argv[])
 	// add_light_to_list(&tracer->lights, a_light);
 	// t_light *p_light = create_light(create_point(5, 5, -4), POINT, 0.7);
 	// add_light_to_list(&tracer->lights, p_light);
+	// t_light *p2_light = create_light(create_point(-5, 5, 0), POINT, 0.7);
+	// add_light_to_list(&tracer->lights, p2_light);
 	// t_light *d_light = create_light(create_point(5, 5, -3), DIRECTIONAL, 0.6);
 	// add_light_to_list(&tracer->lights, d_light);
 
