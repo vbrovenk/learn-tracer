@@ -383,9 +383,9 @@ double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 				double	r_dot_v;
 
 				vec_r = reflect_ray(vec_l, normal);
-
 				r_dot_v = dot_product(vec_r, view);
-				if (r_dot_v > 0)
+
+				if (r_dot_v > 0)					
 					intensity += current->intensity * pow(r_dot_v / (length_vec(vec_r) * length_v), specular);
 				free(vec_r);
 			}
@@ -393,6 +393,7 @@ double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 		free(vec_l);
 		current = current->next;
 	}
+	// printf("intensity = %f\n", intensity);
 	return (intensity);
 }
 
@@ -486,7 +487,7 @@ int		trace_ray(t_tracer *tracer, t_point *origin, t_point *direction,
 		free(temp3);
 	}
 	// for STEP 3
-	t_point *view = mult_k_vec(-1, direction);
+	t_point *view = mult_k_vec(-1.0, direction);
 
 	lighting = compute_lighting(tracer, point, normal, view, closest_shape->specular);
 

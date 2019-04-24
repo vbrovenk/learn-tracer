@@ -41,53 +41,55 @@ double	read_double(char *line)
 	}
 	nbr = ft_atoi(&trim[i]);
 	point = ft_strchr(&trim[i], '.');
+	if (point != NULL && ft_isdigit(point[1]) == 0)
+		return (0);
 	if (point != NULL)
 		nbr += ft_atoi(point + 1) / pow(10, ft_strlen(point + 1));
 	ft_strdel(&trim);
-	printf("nbr = %f\n", nbr * minus);
+	// printf("nbr = %f\n", nbr * minus);
 	return (nbr * minus);
+}
+
+void	read_position(char *line, t_point *point)
+{
+	char **split;
+
+	split = ft_strsplit(line, ',');
+	if (count_splits(split) == 3)
+	{
+		point->x = read_double(split[0]);
+		point->y = read_double(split[1]);
+		point->z = read_double(split[2]);
+	}
+	clear_split(split);
 }
 
 // void	read_position(char *line, t_point *point)
 // {
 // 	char **split;
+// 	char *temp;
 
 // 	split = ft_strsplit(line, ',');
 // 	if (count_splits(split) == 3)
 // 	{
-// 		point->x = read_double(split[0]);
-// 		point->y = read_double(split[1]);
-// 		point->z = read_double(split[0]);
+// 		temp = ft_strtrim(split[0]);
+// 		if (ft_isinteger(temp) == 0)
+// 			print_error("Not integer");
+// 		point->x = ft_atoi(temp);
+// 		free(temp);
+// 		temp = ft_strtrim(split[1]);
+// 		if (ft_isinteger(temp) == 0)
+// 			print_error("Not integer");
+// 		point->y = ft_atoi(temp);
+// 		free(temp);
+// 		temp = ft_strtrim(split[2]);
+// 		if (ft_isinteger(temp) == 0)
+// 			print_error("Not integer");
+// 		point->z = ft_atoi(temp);
+// 		free(temp);
 // 	}
 // 	clear_split(split);
 // }
-
-void	read_position(char *line, t_point *point)
-{
-	char **split;
-	char *temp;
-
-	split = ft_strsplit(line, ',');
-	if (count_splits(split) == 3)
-	{
-		temp = ft_strtrim(split[0]);
-		if (ft_isinteger(temp) == 0)
-			print_error("Not integer");
-		point->x = ft_atoi(temp);
-		free(temp);
-		temp = ft_strtrim(split[1]);
-		if (ft_isinteger(temp) == 0)
-			print_error("Not integer");
-		point->y = ft_atoi(temp);
-		free(temp);
-		temp = ft_strtrim(split[2]);
-		if (ft_isinteger(temp) == 0)
-			print_error("Not integer");
-		point->z = ft_atoi(temp);
-		free(temp);
-	}
-	clear_split(split);
-}
 
 void	read_camera(t_tracer *tracer, int fd)
 {
@@ -216,7 +218,7 @@ int		general_options(char *line, t_shape *shape)
 	else if (ft_strnequ(line, "color: ", 7) == 1)
 	{
 		shape->color = read_color(line + 7);
-		if (shape->color == 0)
+		if (shape->color < 20)
 			shape->color = 0x00FF00;
 	}
 	else if (ft_strnequ(line, "specular: ", 10) == 1)

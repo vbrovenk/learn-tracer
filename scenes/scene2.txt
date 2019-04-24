@@ -20,11 +20,11 @@ specular: 100
 
 
 CYLINDER
-position: -2, 0, 2
-radius: 0.5
-direction: 1, 0.7, 0.5
+position: -0.6, 0, 3
+radius: 0.6
+direction: 0.5, 0.5, 0.3
 
 CONE
-position: 1, 1, 2
+position: 1, -0.3, 1.5
 color: 255, 255, 0
-direction: -1, 1, 0.9
+direction: -0.2, 0.7, 0.7
