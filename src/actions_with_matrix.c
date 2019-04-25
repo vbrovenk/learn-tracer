@@ -24,3 +24,35 @@ t_point *mult_vec_matrix(t_point *vec, t_m3x3 *m) // vec will free here
 	free(vec);
 	return (create_point(a, b, c));
 }
+
+t_point *normalize(t_point *p)
+{
+	double n;
+	double factor;
+	t_point *new;
+
+	new = create_point(0, 0, 0);
+	n = p->x * p->x + p->y * p->y + p->z * p->z;
+	if (n > 0)
+	{
+		factor = 1 / sqrt(n);
+		new->x = p->x * factor;
+		new->y = p->y * factor;
+		new->z = p->z * factor;
+	}
+	else
+	{
+		new->x = p->x;
+		new->y = p->y;
+		new->z = p->z;
+	}
+	return (new);
+}
+
+double	length_vec(t_point *vec)
+{
+	double length;
+
+	length = sqrt(vec->x * vec->x + vec->y * vec->y + vec->z * vec->z);
+	return (length);
+}

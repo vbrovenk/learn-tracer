@@ -38,7 +38,7 @@ double	*find_intersect(double *res, double discriminant, double *coeff)
 	return (res);
 }
 
-double	*intersect_ray_cone(t_tracer *tracer, t_point *origin, t_point *direction, t_shape *shape)
+double	*intersect_ray_cone(t_point *origin, t_point *direction, t_shape *shape)
 {
 	double	coeff[3];
 	double	discriminant;
@@ -82,7 +82,8 @@ t_point	*cone_normal(t_closest *closest_params, t_point *point,
 	free(temp);
 	temp = subtract_points(point, closest_params->closest_shape->center);
 	temp3 = mult_k_vec(coeff, closest_params->closest_shape->dir);
-	temp2 = mult_k_vec(1 + pow(closest_params->closest_shape->angle, 2.0), temp3);
+	temp2 = mult_k_vec(1 + pow(closest_params->closest_shape->angle, 2.0),
+																	temp3);
 	normal = subtract_points(temp, temp2);
 	free(temp);
 	free(temp2);

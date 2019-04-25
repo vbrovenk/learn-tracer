@@ -12,7 +12,8 @@
 
 #include "raytray.h"
 
-double	*intersect_ray_plane(t_tracer *tracer, t_point *origin, t_point *direction, t_shape *shape)
+double	*intersect_ray_plane(t_point *origin, t_point *direction,
+																t_shape *shape)
 {
 	double	*res;
 	t_point	*x;
@@ -42,4 +43,25 @@ t_point	*plane_normal(t_closest *closest_params)
 								closest_params->closest_shape->dir->y,
 								closest_params->closest_shape->dir->z);
 	return (shape_normal);
+}
+
+void	read_plane(t_tracer *tracer, int fd)
+{
+	t_shape	*shape;
+	char	*line;
+
+	line = NULL;
+	shape = create_shape(PLANE);
+	while (get_next_line(fd, &line) > 0)
+	{
+		if (general_options(line, shape) == 1)
+			;
+		else if (ft_strnequ(line, "direction: ", 11))
+			read_direction(line + 11, shape->dir);
+		else
+			break ;
+		ft_strdel(&line);
+	}
+	ft_strdel(&line);
+	add_shape_to_list(&tracer->shapes, shape);
 }

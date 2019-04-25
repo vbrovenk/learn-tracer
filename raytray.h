@@ -18,6 +18,8 @@
 #include "libft.h"
 #include <mlx.h>
 #include <fcntl.h>
+#include <pthread.h>
+
 
 # define WIDTH 520
 # define HEIGHT 520
@@ -133,6 +135,15 @@ typedef struct 	s_light
 
 }				t_light;
 
+typedef struct	s_specular
+{
+	t_light		*current_light;
+	t_point		*vec_l;
+	t_point		*view;
+	double		intensity;
+
+}				t_specular;
+
 /*
 **	s_tracer - main structure
 **	d - direction of ray
@@ -174,25 +185,23 @@ typedef	struct s_closest
 /*
 ** main.c
 */
-void	render(t_tracer *tracer);
 void	start_threads(t_tracer *tracer);
-double	deg_to_rad(double degrees);
 
 /*
 ** actions_with_points.c
 */
-t_point *create_point(double x, double y, double z);
-t_point *subtract_points(t_point *end, t_point *start);
-t_point *add_points(t_point *end, t_point *start);
+t_point	*create_point(double x, double y, double z);
+t_point	*subtract_points(t_point *end, t_point *start);
+t_point	*add_points(t_point *end, t_point *start);
 double	dot_product(t_point *p1, t_point *p2);
-t_point *normalize(t_point *p);
-t_point *mult_k_vec(double k, t_point *vec);
-double	length_vec(t_point *vec);
+t_point	*mult_k_vec(double k, t_point *vec);
 
 /*
 ** actions_with_matrix.c
 */
-t_point *mult_vec_matrix(t_point *vec, t_m3x3 *m);
+t_point	*mult_vec_matrix(t_point *vec, t_m3x3 *m);
+t_point	*normalize(t_point *p);
+double	length_vec(t_point *vec);
 
 /*
 ** rotation.c
@@ -204,12 +213,7 @@ void	rotation_y(t_tracer *tracer);
 /*
 ** create_add.c
 */
-// t_shape *create_shape(int type, t_point *center, double radius, int color, double height_cylinder,
-										// t_point *dir, double specular, double reflective);
-t_shape *create_cone(int type, t_point *center, double radius, int color, double height_cylinder,
-						double angle, double height_cone1, double height_cone2,
-							t_point *dir, double specular, double reflective);
-
+t_shape	*create_shape(int type);
 t_light	*create_light(t_point *position, int type, double intensity);
 void	add_shape_to_list(t_shape **head, t_shape *shape);
 void	add_light_to_list(t_light **head, t_light *light);
@@ -224,37 +228,78 @@ void	print_list_shapes(t_shape *head);
 void	info_about_matrix4x4(double (*matrix)[4]);
 
 /*
-** errors.c
-*/
-void	print_error(char *msg);
-
-/*
 ** scan_data.c
 */
 void	read_data(t_tracer *tracer, char *filename);
+int		general_options(char *line, t_shape *shape);
+void	read_direction(char *line, t_point *direction);
 
 /*
 ** sphere.c
 */
-double	*intersect_ray_sphere(t_tracer *tracer, t_point *origin, t_point *direction, t_shape *shape);
+double	*intersect_ray_sphere(t_point *origin, t_point *direction, t_shape *shape);
 t_point *sphere_normal(t_closest *closest_params, t_point *point);
+void	read_sphere(t_tracer *tracer, int fd);
 
 /*
 ** plane.c
 */
-double	*intersect_ray_plane(t_tracer *tracer, t_point *origin, t_point *direction, t_shape *shape);
+double	*intersect_ray_plane(t_point *origin, t_point *direction, t_shape *shape);
 t_point	*plane_normal(t_closest *closest_params);
+void	read_plane(t_tracer *tracer, int fd);
 
 /*
 ** cylinder.c
 */
-double *intersect_ray_cylinder(t_tracer *tracer, t_point *origin, t_point *direction, t_shape *shape);
+double	*intersect_ray_cylinder(t_point *origin, t_point *direction, t_shape *shape);
 t_point	*cylinder_normal(t_closest *closest_params, t_point *point, t_point *origin, t_point *direction);
+void	read_cylinder(t_tracer *tracer, int fd);
 
 /*
 ** cone.c
 */
-double *intersect_ray_cone(t_tracer *tracer, t_point *origin, t_point *direction, t_shape *shape);
+double	*intersect_ray_cone(t_point *origin, t_point *direction, t_shape *shape);
 t_point	*cone_normal(t_closest *closest_params, t_point *point, t_point *origin, t_point *direction);
+
+/*
+** light.c
+*/
+double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal, double specular);
+
+/*
+** scan_light.c
+*/
+void	read_light(t_tracer *tracer, int fd);
+int		read_color(char *line);
+int		is_number(char *line);
+
+/*
+** intersection.c
+*/
+t_closest	*closest_intersection(t_tracer *tracer, t_point *origin, t_point *d, double *min_max);
+
+/*
+** camera.c
+*/
+void	read_camera(t_tracer *tracer, int fd);
+void	read_position(char *line, t_point *point);
+double	read_double(char *line);
+int		count_splits(char **split);
+void	clear_split(char **split);
+
+/*
+** canvas.c
+*/
+void	put_pixel(t_tracer *tracer, int x, int y, int color);
+t_point	*canvas_to_viewport(int x, int y);
+int		mult_k_color(double k, int color);
+
+/*
+** hooks.c
+*/
+t_tracer	*init_struct(void);
+int		x_exit(void *param);
+int		choose_key(int key, t_tracer *tracer);
+void	print_error(char *msg);
 
 #endif

@@ -34,8 +34,8 @@ double	*cut_cylinder(t_point *origin, t_shape *shape, double value,
 	return (res);
 }
 
-double	*intersect_ray_cylinder(t_tracer *tracer, t_point *origin,
-								t_point *direction, t_shape *shape)
+double	*intersect_ray_cylinder(t_point *origin, t_point *direction,
+															t_shape *shape)
 {
 	double	coeff[3];
 	double	discriminant;
@@ -83,4 +83,31 @@ t_point	*cylinder_normal(t_closest *closest_params, t_point *point,
 	free(temp);
 	free(temp2);
 	return (normal);
+}
+
+void	read_cylinder(t_tracer *tracer, int fd)
+{
+	t_shape	*shape;
+	char	*line;
+
+	line = NULL;
+	shape = create_shape(CYLINDER);
+	while (get_next_line(fd, &line) > 0)
+	{
+		if (general_options(line, shape) == 1)
+			;
+		else if (ft_strnequ(line, "direction: ", 11))
+			read_direction(line + 11, shape->dir);
+		else if (ft_strnequ(line, "height: ", 8) == 1)
+		{
+			shape->height_cylinder = read_double(line + 8);
+			if (shape->height_cylinder <= 0)
+				shape->height_cylinder = INFINIT;
+		}
+		else
+			break ;
+		ft_strdel(&line);
+	}
+	ft_strdel(&line);
+	add_shape_to_list(&tracer->shapes, shape);
 }

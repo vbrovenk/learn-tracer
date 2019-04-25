@@ -18,7 +18,9 @@ INC_DIR = .
 LIBFT_INC = ./libft/includes/
 LIBFT = ./libft/libft.a
 
+# MLX_FLAGS = -lmlx -framework OpenGL -framework AppKit
 MLX_FLAGS = -lmlx -framework OpenGL -framework AppKit
+
 UBUNTU_FLAGS = -lm -lmlx -lXext -lX11 -L minilibx -I minilibx
 SRC =	main.c \
 		actions_with_points.c \
@@ -26,12 +28,17 @@ SRC =	main.c \
 		rotation.c \
 		create_add.c \
 		print.c \
-		errors.c \
 		scan_data.c \
 		sphere.c \
 		plane.c \
 		cylinder.c \
 		cone.c \
+		light.c \
+		intersection.c \
+		canvas.c \
+		hooks.c \
+		camera.c \
+		scan_light.c
 
 OBJ = $(addprefix obj/, $(SRC:.c=.o))
 
@@ -53,7 +60,7 @@ libft/libft.a:
 	@make -C libft/
 
 obj/%.o: src/%.c $(INCLUDE)
-	@gcc -c $< -o $@  -I $(LIBFT_INC) -I $(INC_DIR)
+	@gcc -c $< -o $@  -I $(LIBFT_INC) -I $(INC_DIR) $(CFLAGS)
 	@echo "$(PURPLELIGHT)Compiling $(WHITE)$< $(PURPLELIGHT)done$(OFF)"
 
 obj:

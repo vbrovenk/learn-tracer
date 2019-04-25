@@ -12,7 +12,8 @@
 
 #include "raytray.h"
 
-double	*intersect_ray_sphere(t_tracer *tracer, t_point *origin, t_point *direction, t_shape *shape)
+double	*intersect_ray_sphere(t_point *origin, t_point *direction,
+																t_shape *shape)
 {
 	t_point	*oc;
 	double	coeff[3];
@@ -41,7 +42,7 @@ double	*intersect_ray_sphere(t_tracer *tracer, t_point *origin, t_point *directi
 	return (res);
 }
 
-t_point *sphere_normal(t_closest *closest_params, t_point *point)
+t_point	*sphere_normal(t_closest *closest_params, t_point *point)
 {
 	t_point	*temp;
 	t_point	*normal;
@@ -50,4 +51,23 @@ t_point *sphere_normal(t_closest *closest_params, t_point *point)
 	normal = mult_k_vec(1.0 / length_vec(temp), temp);
 	free(temp);
 	return (normal);
+}
+
+void	read_sphere(t_tracer *tracer, int fd)
+{
+	t_shape	*shape;
+	char	*line;
+
+	shape = create_shape(SPHERE);
+	line = NULL;
+	while (get_next_line(fd, &line) > 0)
+	{
+		if (general_options(line, shape) == 1)
+			;
+		else
+			break ;
+		ft_strdel(&line);
+	}
+	ft_strdel(&line);
+	add_shape_to_list(&tracer->shapes, shape);
 }
