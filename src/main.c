@@ -25,6 +25,8 @@ void	init_struct(t_tracer *tracer)
 	tracer->shapes = NULL;
 	tracer->lights = NULL;
 
+	tracer->d = NULL;
+
 	tracer->degrees_x = 0;
 	tracer->degrees_y = 0;
 }
@@ -121,8 +123,7 @@ t_closest	*init_closest(void)
 	return (closest);
 }
 
-t_closest	*closest_intersection(t_tracer *tracer, t_point *origin, t_point *direction,
-											double min, double max)
+t_closest	*closest_intersection(t_tracer *tracer, t_point *origin, t_point *d, double *min_max)
 {
 	t_shape		*current_shape;
 	double		*ts;
@@ -136,20 +137,20 @@ t_closest	*closest_intersection(t_tracer *tracer, t_point *origin, t_point *dire
 		if (ts != NULL)
 			free(ts);
 		if (current_shape->type == SPHERE)
-			ts = intersect_ray_sphere(tracer, origin, direction, current_shape);
+			ts = intersect_ray_sphere(tracer, origin, d, current_shape);
 		else if (current_shape->type == PLANE)
-			ts = intersect_ray_plane(tracer, origin, direction, current_shape);
+			ts = intersect_ray_plane(tracer, origin, d, current_shape);
 		else if (current_shape->type == CYLINDER)
-			ts = intersect_ray_cylinder(tracer, origin, direction, current_shape);
+			ts = intersect_ray_cylinder(tracer, origin, d, current_shape);
 		else if (current_shape->type == CONE)
-			ts = intersect_ray_cone(tracer, origin, direction, current_shape);
+			ts = intersect_ray_cone(tracer, origin, d, current_shape);
 
-		if (ts[0] < closest_params->closest_v && min < ts[0] && ts[0] < max)
+		if (ts[0] < closest_params->closest_v && min_max[0] < ts[0] && ts[0] < min_max[1])
 		{
 			closest_params->closest_v = ts[0];
 			closest_params->closest_shape = current_shape;
 		}
-		if (ts[1] < closest_params->closest_v && min < ts[1] && ts[1] < max)
+		if (ts[1] < closest_params->closest_v && min_max[0] < ts[1] && ts[1] < min_max[1])
 		{
 			closest_params->closest_v = ts[1];
 			closest_params->closest_shape = current_shape;
@@ -174,7 +175,7 @@ double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 	t_point		*vec_l;
 	// for specular
 	double		length_v;
-
+	double min_max[2];
 	int need_free = 0;
 
 
@@ -205,7 +206,9 @@ double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 			}
 
 			// Shadow check for STEP 4
-			t_closest *blocker = closest_intersection(tracer, point, vec_l, EPSILON, max);
+			min_max[0] = EPSILON;
+			min_max[1] = max;
+			t_closest *blocker = closest_intersection(tracer, point, vec_l, min_max);
 			if (blocker != NULL)
 			{
 				free(blocker);
@@ -236,7 +239,6 @@ double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 		free(vec_l);
 		current = current->next;
 	}
-	// printf("intensity = %f\n", intensity);
 	return (intensity);
 }
 
@@ -262,82 +264,49 @@ int		mult_k_color(double k, int color)
 	return ((r << 16) | (g << 8) | (b));
 }
 
-// int		trace_ray(t_tracer *tracer, t_point *origin, t_point *direction,
-// 									double t_min, double t_max, int depth)
-// {
-// 	t_closest	*closest_params;
-// 		// added in STEP 2
-// 	t_point		*point;
-// 	t_point		*normal;
-// 	double		lighting;
-// 	int			local_color;
-
-// 	t_point		*view;
-
-// 	closest_params = closest_intersection(tracer, origin, direction, t_min, t_max);
-// 	if (closest_params == NULL)
-// 		return (BACKGROUND);
-// 	t_point *temp;
-// 	temp = mult_k_vec(closest_params->closest_v, direction);
-// 	point = add_points(origin, temp);
-// 	free(temp);
-// 	if (closest_params->closest_shape->type == SPHERE)
-// 		normal = sphere_normal(closest_params, point);
-// 	else if (closest_params->closest_shape->type == PLANE)
-// 		normal = plane_normal(closest_params);
-// 	else if (closest_params->closest_shape->type == CYLINDER)
-// 		normal = cylinder_normal(closest_params, point, origin, direction);
-// 	else if (closest_params->closest_shape->type == CONE)
-// 		normal = cone_normal(closest_params, point, origin, direction);
-// 	view = mult_k_vec(-1.0, direction);
-// 	lighting = compute_lighting(tracer, point, normal, view, closest_params->closest_shape->specular);
-// 	local_color = mult_k_color(lighting, closest_params->closest_shape->color);
-// 	free(closest_params);
-// 	free(point);
-// 	free(normal);
-// 	free(view);
-// 	return (local_color);
-// }
-
-int		noral_light()
+int		normal_light(t_tracer *tracer, t_closest *closest_params, t_point *point, t_point *origin)
 {
-
-}
-
-int		trace_ray(t_tracer *tracer, t_point *origin, t_point *direction,
-									double t_min, double t_max, int depth)
-{
-	t_closest	*closest_params;
-		// added in STEP 2
-	t_point		*point;
 	t_point		*normal;
+	t_point		*view;
 	double		lighting;
 	int			local_color;
 
-	t_point		*view;
-
-	closest_params = closest_intersection(tracer, origin, direction, t_min, t_max);
-	if (closest_params == NULL)
-		return (BACKGROUND);
-	t_point *temp;
-	temp = mult_k_vec(closest_params->closest_v, direction);
-	point = add_points(origin, temp);
-	free(temp);
 	if (closest_params->closest_shape->type == SPHERE)
 		normal = sphere_normal(closest_params, point);
 	else if (closest_params->closest_shape->type == PLANE)
 		normal = plane_normal(closest_params);
 	else if (closest_params->closest_shape->type == CYLINDER)
-		normal = cylinder_normal(closest_params, point, origin, direction);
+		normal = cylinder_normal(closest_params, point, origin, tracer->d);
 	else if (closest_params->closest_shape->type == CONE)
-		normal = cone_normal(closest_params, point, origin, direction);
-	view = mult_k_vec(-1.0, direction);
-	lighting = compute_lighting(tracer, point, normal, view, closest_params->closest_shape->specular);
+		normal = cone_normal(closest_params, point, origin, tracer->d);
+	view = mult_k_vec(-1.0, tracer->d);
+	lighting = compute_lighting(tracer, point, normal, view,
+							closest_params->closest_shape->specular);
 	local_color = mult_k_color(lighting, closest_params->closest_shape->color);
-	free(closest_params);
-	free(point);
 	free(normal);
 	free(view);
+	return (local_color);
+}
+
+int		trace_ray(t_tracer *tracer, t_point *origin, double t_min, double t_max)
+{
+	t_closest	*closest_params;
+	t_point		*point;
+	int			local_color;
+	double		min_max[2];
+
+	min_max[0] = t_min;
+	min_max[1] = t_max;
+	closest_params = closest_intersection(tracer, origin, tracer->d, min_max);
+	if (closest_params == NULL)
+		return (BACKGROUND);
+	t_point *temp;
+	temp = mult_k_vec(closest_params->closest_v, tracer->d);
+	point = add_points(origin, temp);
+	free(temp);
+	local_color = normal_light(tracer, closest_params, point, origin);
+	free(closest_params);
+	free(point);
 	return (local_color);
 }
 
@@ -355,13 +324,14 @@ void	render(t_tracer *tracer)
 		// y = -HEIGHT / 2;
 		// while (y < HEIGHT / 2)
 		{
-			t_point *direction = canvas_to_viewport(x, y);
+			// t_point *direction = canvas_to_viewport(x, y);
+			tracer->d = canvas_to_viewport(x, y);
 			rotation_x(tracer);
 			// rotation_y(tracer);
-			direction = mult_vec_matrix(direction, tracer->camera_rotation);
-			color = trace_ray(tracer, tracer->camera_position, direction, 1.0, INFINIT, RECURSION_DEPTH);
+			tracer->d = mult_vec_matrix(tracer->d, tracer->camera_rotation);
+			color = trace_ray(tracer, tracer->camera_position, 1.0, INFINIT);
 			put_pixel(tracer, x, y, color);
-			free(direction);
+			free(tracer->d);
 			y++;
 		}
 		x++;

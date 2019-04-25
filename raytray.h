@@ -133,6 +133,10 @@ typedef struct 	s_light
 
 }				t_light;
 
+/*
+**	s_tracer - main structure
+**	d - direction of ray
+*/
 typedef struct s_tracer
 {
 	void *mlx_ptr;
@@ -147,6 +151,8 @@ typedef struct s_tracer
 	// for ray-tracer
 	t_point *camera_position;
 	t_m3x3 *camera_rotation;
+
+	t_point	*d;
 	
 	t_shape		*shapes;
 	t_light		*lights;
