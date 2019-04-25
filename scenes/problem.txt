@@ -1,9 +1,0 @@
-CAMERA
-position: 0, 0, 0
-
-LIGHT
-position: 0, -1, 0
-intensity: 0.7
-
-PLANE
-position: 0, 1, 0

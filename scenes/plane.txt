@@ -1,0 +1,10 @@
+CAMERA
+position: 0, 2, 0
+
+LIGHT
+position: 2, 4, -2
+intensity: 0.8
+
+PLANE
+position: 0, -1, 0
+color: 255, 255, 0

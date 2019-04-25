@@ -266,14 +266,8 @@ void	read_direction_plane(char *line, t_point *direction)
 	if (count_splits(split) == 3)
 	{
 		direction->x = read_double(split[0]);
-		if (direction->x < 0)
-			direction->x *= -1;
 		direction->y = read_double(split[1]);
-		if (direction->y < 0)
-			direction->y *= -1;
 		direction->z = read_double(split[2]);
-		if (direction->z > 0)
-			print_error("Direction's z must be < 0");
 	}
 	norm = normalize(direction);
 	direction->x = norm->x;

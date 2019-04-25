@@ -1,0 +1,13 @@
+CAMERA
+position: 0, 0, 0
+
+LIGHT
+position: -4, 8, -2
+intensity: 0.8
+
+CONE
+position: -2, 2, 7
+color: 255, 0, 255
+height1: 0
+height2: 4
+direction: -0.6, 0.4, 0
