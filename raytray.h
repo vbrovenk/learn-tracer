@@ -205,8 +205,8 @@ double	length_vec(t_point *vec);
 ** rotation.c
 */
 void	init_rotation(t_tracer *tracer);
-void	rotation_x(t_tracer *tracer);
-void	rotation_y(t_tracer *tracer);
+t_point	*rotation_x(t_point *direction, int angle);
+t_point	*rotation_y(t_point *direction, int angle);
 
 /*
 ** create_add.c
@@ -291,7 +291,7 @@ void	clear_split(char **split);
 ** canvas.c
 */
 void	put_pixel(t_tracer *tracer, int x, int y, int color);
-t_point	*canvas_to_viewport(int x, int y);
+t_point	*canvas_to_viewport(int x, int y, int angle_x, int angle_y);
 int		mult_k_color(double k, int color);
 
 /*

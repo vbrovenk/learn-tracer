@@ -30,18 +30,40 @@ void	init_rotation(t_tracer *tracer)
 	tracer->camera_rotation->matrix[2][2] = 1;
 }
 
-void	rotation_x(t_tracer *tracer)
+
+// t_vec		rot_y(t_vec v, int angle)
+// {
+// 	double	x;
+// 	double	z;
+
+// 	x = v.x;
+// 	z = v.z;
+// 	v.x = x * cos(RAD(angle)) + z * sin(RAD(angle));
+// 	v.z = -x * sin(RAD(angle)) + z * cos(RAD(angle));
+// 	return (v);
+// }
+
+
+t_point	*rotation_x(t_point *direction, int angle)
 {
-	tracer->camera_rotation->matrix[1][1] = cos(tracer->degrees_x * M_PI / 180);
-	tracer->camera_rotation->matrix[1][2] = -sin(tracer->degrees_x * M_PI / 180);
-	tracer->camera_rotation->matrix[2][1] = sin(tracer->degrees_x * M_PI / 180);
-	tracer->camera_rotation->matrix[2][2] = cos(tracer->degrees_x * M_PI / 180);
+	t_point *new_direction;
+
+	new_direction = create_point(direction->x, direction->y, direction->z);
+	new_direction->y = direction->y *
+		cos(angle * M_PI / 180) - direction->z * sin(angle * M_PI / 180);
+	new_direction->z = direction->y * sin(angle * M_PI / 180) +
+									direction->z * cos(angle * M_PI / 180);
+	return (new_direction);
 }
 
-void	rotation_y(t_tracer *tracer)
+t_point	*rotation_y(t_point *direction, int angle)
 {
-	tracer->camera_rotation->matrix[0][0] = cos(tracer->degrees_y * M_PI / 180);
-	tracer->camera_rotation->matrix[0][2] = sin(tracer->degrees_y * M_PI / 180);
-	tracer->camera_rotation->matrix[2][0] = -sin(tracer->degrees_y * M_PI / 180);
-	tracer->camera_rotation->matrix[2][2] = cos(tracer->degrees_y * M_PI / 180);
+	t_point *new_direction;
+
+	new_direction = create_point(direction->x, direction->y, direction->z);
+	new_direction->x = direction->x *
+		cos(angle * M_PI / 180) + direction->z * sin(angle * M_PI / 180);
+	new_direction->z = -direction->x * sin(angle * M_PI / 180) +
+									direction->z * cos(angle * M_PI / 180);
+	return (new_direction);
 }

@@ -84,10 +84,7 @@ void	render(t_tracer *tracer)
 		y = tracer->start;
 		while (y < tracer->start + HEIGHT / THREADS)
 		{
-			direction = canvas_to_viewport(x, y);
-			rotation_x(tracer);
-			// rotation_y(tracer);
-			direction = mult_vec_matrix(direction, tracer->camera_rotation);
+			direction = canvas_to_viewport(x, y, tracer->degrees_x, tracer->degrees_y);
 			color = trace_ray(tracer, tracer->camera_position, direction, 1.0, INFINIT, RECURSION_DEPTH);
 			put_pixel(tracer, x, y, color);
 			free(direction);

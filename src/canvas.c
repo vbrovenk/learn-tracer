@@ -24,15 +24,22 @@ void	put_pixel(t_tracer *tracer, int x, int y, int color)
 	tracer->image[screen_x + screen_y * HEIGHT] = color;
 }
 
-t_point	*canvas_to_viewport(int x, int y)
+t_point	*canvas_to_viewport(int x, int y, int angle_x, int angle_y)
 {
 	t_point	*view_point;
+	t_point *temp;
 	double	a;
 	double	b;
 
 	a = x * VIEWPORT_SIZE / (double)WIDTH;
 	b = y * VIEWPORT_SIZE / (double)HEIGHT;
 	view_point = create_point(a, b, PROJECTION_PLANE_Z);
+	temp = view_point;
+	view_point = rotation_x(view_point, angle_x);
+	free(temp);
+	temp = view_point;
+	view_point = rotation_y(view_point, angle_y);
+	free(temp);
 	return (view_point);
 }
 
