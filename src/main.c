@@ -12,49 +12,63 @@
 
 #include "raytray.h"
 
-int		normal_light(t_tracer *tracer, t_closest *closest_params,
-												t_point *point, t_point *origin)
-{
-	t_point	*normal;
-	double	lighting;
-	int		local_color;
-
-	normal = NULL;
-	if (closest_params->closest_shape->type == SPHERE)
-		normal = sphere_normal(closest_params, point);
-	else if (closest_params->closest_shape->type == PLANE)
-		normal = plane_normal(closest_params);
-	else if (closest_params->closest_shape->type == CYLINDER)
-		normal = cylinder_normal(closest_params, point, origin, tracer->d);
-	else if (closest_params->closest_shape->type == CONE)
-		normal = cone_normal(closest_params, point, origin, tracer->d);
-	lighting = compute_lighting(tracer, point, normal,
-							closest_params->closest_shape->specular);
-	local_color = mult_k_color(lighting, closest_params->closest_shape->color);
-	free(normal);
-	return (local_color);
-}
-
-int		trace_ray(t_tracer *tracer, t_point *origin, double t_min, double t_max)
+int		trace_ray(t_tracer *tracer, t_point *origin, t_point *direction,
+									double t_min, double t_max, int depth)
 {
 	t_closest	*closest_params;
 	t_point		*point;
-	int			local_color;
 	double		min_max[2];
 	t_point		*temp;
 
 	min_max[0] = t_min;
 	min_max[1] = t_max;
-	closest_params = closest_intersection(tracer, origin, tracer->d, min_max);
+	closest_params = closest_intersection(tracer, origin, direction, min_max);
 	if (closest_params == NULL)
 		return (BACKGROUND);
-	temp = mult_k_vec(closest_params->closest_v, tracer->d);
+	temp = mult_k_vec(closest_params->closest_v, direction);
 	point = add_points(origin, temp);
 	free(temp);
-	local_color = normal_light(tracer, closest_params, point, origin);
+	
+	t_point	*normal;
+	double	lighting;
+	int		local_color;
+
+	if (closest_params->closest_shape->type == SPHERE)
+		normal = sphere_normal(closest_params, point);
+	else if (closest_params->closest_shape->type == PLANE)
+		normal = plane_normal(closest_params);
+	else if (closest_params->closest_shape->type == CYLINDER)
+		normal = cylinder_normal(closest_params, point, origin, direction);
+	else if (closest_params->closest_shape->type == CONE)
+		normal = cone_normal(closest_params, point, origin, direction);
+	
+	t_point *view = mult_k_vec(-1.0, direction);
+	lighting = compute_lighting(tracer, point, normal,
+							closest_params->closest_shape->specular, view);
+	local_color = mult_k_color(lighting, closest_params->closest_shape->color);
+
+
+	if (closest_params->closest_shape->reflective <= 0 || depth <= 0)
+	{
+		free(normal);
+		free(closest_params);
+		free(point);
+		// free(view);
+		return (local_color);
+	}
+
+	// ===================== REFLECTIVE ========================
+	t_point *reflected_ray = reflect_ray(view, normal);
+	int		reflected_color = trace_ray(tracer, point, reflected_ray, EPSILON, INFINIT, depth - 1);
+
+	int tmp_color1 = mult_k_color(1 - closest_params->closest_shape->reflective, local_color);
+	int tmp_color2 = mult_k_color(closest_params->closest_shape->reflective, reflected_color);
+
+	free(normal);
 	free(closest_params);
 	free(point);
-	return (local_color);
+	// free(view);
+	return(tmp_color1 + tmp_color2);
 }
 
 void	render(t_tracer *tracer)
@@ -62,6 +76,7 @@ void	render(t_tracer *tracer)
 	int x;
 	int y;
 	int color;
+	t_point *direction;
 
 	x = -WIDTH / 2;
 	while (x < WIDTH / 2)
@@ -69,13 +84,13 @@ void	render(t_tracer *tracer)
 		y = tracer->start;
 		while (y < tracer->start + HEIGHT / THREADS)
 		{
-			tracer->d = canvas_to_viewport(x, y);
+			direction = canvas_to_viewport(x, y);
 			rotation_x(tracer);
 			// rotation_y(tracer);
-			tracer->d = mult_vec_matrix(tracer->d, tracer->camera_rotation);
-			color = trace_ray(tracer, tracer->camera_position, 1.0, INFINIT);
+			direction = mult_vec_matrix(direction, tracer->camera_rotation);
+			color = trace_ray(tracer, tracer->camera_position, direction, 1.0, INFINIT, RECURSION_DEPTH);
 			put_pixel(tracer, x, y, color);
-			free(tracer->d);
+			free(direction);
 			y++;
 		}
 		x++;

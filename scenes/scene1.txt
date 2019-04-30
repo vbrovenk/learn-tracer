@@ -10,5 +10,15 @@ position: 0, -1, 0
 color: 0, 0, 255
 
 CONE
-position: 0, 0, 4
+position: 0, 4, 4
 color: 255, 255, 0
+reflective: 0.4
+height1: 0
+
+SPHERE
+color: 255, 0, 0
+position: 2, 3, 4
+
+CYLINDER
+position: -2, 0, 3
+reflective: 0.3

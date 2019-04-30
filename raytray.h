@@ -28,13 +28,13 @@
 # define MIN_T 1
 # define INFINIT 2147483647
 # define EPSILON 0.001
-# define RECURSION_DEPTH 0
+# define RECURSION_DEPTH 1
 
 # define VIEWPORT_SIZE 1
 # define PROJECTION_PLANE_Z 1
 # define FOV 60
 
-# define THREADS 8
+# define THREADS 4
 
 /*
 ** For light
@@ -139,7 +139,6 @@ typedef struct	s_specular
 {
 	t_light		*current_light;
 	t_point		*vec_l;
-	t_point		*view;
 	double		intensity;
 
 }				t_specular;
@@ -163,7 +162,6 @@ typedef struct s_tracer
 	t_point *camera_position;
 	t_m3x3 *camera_rotation;
 
-	t_point	*d;
 	
 	t_shape		*shapes;
 	t_light		*lights;
@@ -264,7 +262,9 @@ t_point	*cone_normal(t_closest *closest_params, t_point *point, t_point *origin,
 /*
 ** light.c
 */
-double	compute_lighting(t_tracer *tracer, t_point *point, t_point *normal, double specular);
+double		compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
+											double specular, t_point *view);
+t_point		*reflect_ray(t_point *vec1, t_point *vec2);
 
 /*
 ** scan_light.c

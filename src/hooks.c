@@ -23,7 +23,6 @@ t_tracer	*init_struct(void)
 	tracer->camera_rotation = NULL;
 	tracer->shapes = NULL;
 	tracer->lights = NULL;
-	tracer->d = NULL;
 	tracer->degrees_x = 0;
 	tracer->degrees_y = 0;
 	return (tracer);

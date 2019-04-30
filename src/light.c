@@ -23,7 +23,7 @@ t_point		*reflect_ray(t_point *vec1, t_point *vec2)
 	return (sub);
 }
 
-void		compute_specular(t_point *normal, double specular, t_specular *spec)
+void		compute_specular(t_point *normal, double specular, t_specular *spec, t_point *view)
 {
 	double		n_dot_l;
 	t_point		*vec_r;
@@ -36,10 +36,10 @@ void		compute_specular(t_point *normal, double specular, t_specular *spec)
 	if (specular >= 0)
 	{
 		vec_r = reflect_ray(spec->vec_l, normal);
-		r_dot_v = dot_product(vec_r, spec->view);
+		r_dot_v = dot_product(vec_r, view);
 		if (r_dot_v > 0)
 			spec->intensity += spec->current_light->intensity * pow(r_dot_v /
-						(length_vec(vec_r) * length_vec(spec->view)), specular);
+						(length_vec(vec_r) * length_vec(view)), specular);
 		free(vec_r);
 	}
 }
@@ -50,14 +50,14 @@ t_specular	*init_specular(t_tracer *tracer)
 
 	if ((spec = (t_specular *)malloc(sizeof(t_specular))) == NULL)
 		print_error("Can't malloc memory for t_specular");
-	spec->view = mult_k_vec(-1.0, tracer->d);
+
 	spec->intensity = 0;
 	spec->current_light = tracer->lights;
 	return (spec);
 }
 
 double		compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
-															double specular)
+											double specular, t_point *view)
 {
 	double		min_max[2];
 	t_closest	*blocker;
@@ -77,11 +77,10 @@ double		compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 			spec->current_light = spec->current_light->next;
 			continue ;
 		}
-		compute_specular(normal, specular, spec);
+		compute_specular(normal, specular, spec, view);
 		free(spec->vec_l);
 		spec->current_light = spec->current_light->next;
 	}
-	free(spec->view);
 	free(spec);
 	return (spec->intensity);
 }

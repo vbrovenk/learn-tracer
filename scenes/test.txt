@@ -2,10 +2,32 @@ CAMERA
 position: 0, 0, 0
 
 LIGHT
-position: 3, 0, -1
+position: 3, 3, -1
 intensity: 0.7
 
+LIGHT
+position: -3, 3, -1
+intensity: 0.3
+
+PLANE
+position: 0, 0, 10
+direction: 0, 0, -1
+color: 51, 204, 51
+
+PLANE
+position: 0, -2, 0
+color: 51, 204, 51
+
 CONE
-position: 0, 0, 4
-color: 255, 255, 30
-direction: 0, 0, 1
+position: -4, 1, 4
+color: 255, 102, 0
+
+
+SPHERE
+position: -1, 0, 4
+color: 102, 153, 255
+reflective: 0.4
+
+CYLINDER
+position: 2, 0, 4
+color: 242, 242, 242

@@ -34,6 +34,10 @@ int		general_options(char *line, t_shape *shape)
 		if (is_number(line + 8) == 0 || shape->radius < 0)
 			shape->radius = 1.0;
 	}
+	else if (ft_strnequ(line, "reflective: ", 12) == 1)
+	{
+		shape->reflective = read_double(line + 12);
+	}
 	else
 		return (0);
 	return (1);
