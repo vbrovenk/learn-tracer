@@ -53,14 +53,14 @@ PURPLELIGHT=\033[38;2;102;102;255m
 all: $(NAME)
 
 $(NAME): libft/libft.a obj $(OBJ)
-	@gcc $(OBJ) $(LIBFT) $(MLX_FLAGS) -o $(NAME)
+	@gcc $(OBJ) $(LIBFT) $(UBUNTU_FLAGS) -o $(NAME) -lpthread
 	@echo "$(PURPLEBOLD)RTv1 $(PURPLE)is ready$(OFF)"
 
 libft/libft.a:
 	@make -C libft/
 
 obj/%.o: src/%.c $(INCLUDE)
-	@gcc -c $< -o $@  -I $(LIBFT_INC) -I $(INC_DIR) $(CFLAGS)
+	@gcc -c $< -o $@  -I $(LIBFT_INC) -I $(INC_DIR) $(UBUNTU_FLAGS)
 	@echo "$(PURPLELIGHT)Compiling $(WHITE)$< $(PURPLELIGHT)done$(OFF)"
 
 obj:
