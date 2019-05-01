@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "raytray.h"
+#include <time.h>
+
 
 int		trace_ray(t_tracer *tracer, t_point *origin, t_point *direction,
 									double t_min, double t_max, int depth)
@@ -145,6 +147,10 @@ int	main(int argc, char *argv[])
 		print_error("Camera must be set");
 	init_rotation(tracer);
 	start_threads(tracer);
+
+	clock_t time = clock();
+	printf("time = %f sec\n", (time / (float)CLOCKS_PER_SEC) / THREADS);
+
 	mlx_hook(tracer->win_ptr, 2, 5, choose_key, tracer);
 	mlx_hook(tracer->win_ptr, 17, 1L << 17, x_exit, 0);
 	mlx_loop(tracer->mlx_ptr);

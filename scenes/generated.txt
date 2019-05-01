@@ -1,0 +1,420 @@
+CAMERA
+position: 0, 0, -40
+
+LIGHT
+position: 3, 3, -1
+intensity: 0.7
+
+LIGHT
+position: -3, 3, -1
+intensity: 0.3
+
+PLANE
+position: 0, 0, 10
+direction: 0, 0, -1
+color: 51, 204, 51
+
+PLANE
+position: 0, -2, 0
+color: 51, 204, 51
+
+
+SPHERE
+position: -10, 0, 4
+color: 102, 153, 255
+
+SPHERE
+position: -8, 0, 4
+color: 102, 153, 255
+
+SPHERE
+position: -6, 0, 4
+color: 102, 153, 255
+
+SPHERE
+position: -4, 0, 4
+color: 102, 153, 255
+
+SPHERE
+position: -2, 0, 4
+color: 102, 153, 255
+
+SPHERE
+position: 0, 0, 4
+color: 102, 153, 255
+
+SPHERE
+position: 2, 0, 4
+color: 102, 153, 255
+
+SPHERE
+position: 4, 0, 4
+color: 102, 153, 255
+
+SPHERE
+position: 6, 0, 4
+color: 102, 153, 255
+
+SPHERE
+position: 8, 0, 4
+color: 102, 153, 255
+
+SPHERE
+position: -6, 2, 4
+color: 102, 153, 255
+
+SPHERE
+position: -4, 2, 4
+color: 102, 153, 255
+
+SPHERE
+position: -2, 2, 4
+color: 102, 153, 255
+
+SPHERE
+position: 0, 2, 4
+color: 102, 153, 255
+
+SPHERE
+position: 2, 2, 4
+color: 102, 153, 255
+
+SPHERE
+position: 4, 2, 4
+color: 102, 153, 255
+
+SPHERE
+position: 6, 2, 4
+color: 102, 153, 255
+
+SPHERE
+position: 8, 2, 4
+color: 102, 153, 255
+
+SPHERE
+position: -6, 4, 4
+color: 102, 153, 255
+
+SPHERE
+position: -4, 4, 4
+color: 102, 153, 255
+
+SPHERE
+position: -2, 4, 4
+color: 102, 153, 255
+
+SPHERE
+position: 0, 4, 4
+color: 102, 153, 255
+
+SPHERE
+position: 2, 4, 4
+color: 102, 153, 255
+
+SPHERE
+position: 4, 4, 4
+color: 102, 153, 255
+
+SPHERE
+position: 6, 4, 4
+color: 102, 153, 255
+
+SPHERE
+position: 8, 4, 4
+color: 102, 153, 255
+
+SPHERE
+position: -6, 6, 4
+color: 102, 153, 255
+
+SPHERE
+position: -4, 6, 4
+color: 102, 153, 255
+
+SPHERE
+position: -2, 6, 4
+color: 102, 153, 255
+
+SPHERE
+position: 0, 6, 4
+color: 102, 153, 255
+
+SPHERE
+position: 2, 6, 4
+color: 102, 153, 255
+
+SPHERE
+position: 4, 6, 4
+color: 102, 153, 255
+
+SPHERE
+position: 6, 6, 4
+color: 102, 153, 255
+
+SPHERE
+position: 8, 6, 4
+color: 102, 153, 255
+
+SPHERE
+position: -6, 8, 4
+color: 102, 153, 255
+
+SPHERE
+position: -4, 8, 4
+color: 102, 153, 255
+
+SPHERE
+position: -2, 8, 4
+color: 102, 153, 255
+
+SPHERE
+position: 0, 8, 4
+color: 102, 153, 255
+
+SPHERE
+position: 2, 8, 4
+color: 102, 153, 255
+
+SPHERE
+position: 4, 8, 4
+color: 102, 153, 255
+
+SPHERE
+position: 6, 8, 4
+color: 102, 153, 255
+
+SPHERE
+position: 8, 8, 4
+color: 102, 153, 255
+
+SPHERE
+position: -6, 10, 4
+color: 102, 153, 255
+
+SPHERE
+position: -4, 10, 4
+color: 102, 153, 255
+
+SPHERE
+position: -2, 10, 4
+color: 102, 153, 255
+
+SPHERE
+position: 0, 10, 4
+color: 102, 153, 255
+
+SPHERE
+position: 2, 10, 4
+color: 102, 153, 255
+
+SPHERE
+position: 4, 10, 4
+color: 102, 153, 255
+
+SPHERE
+position: 6, 10, 4
+color: 102, 153, 255
+
+SPHERE
+position: 8, 10, 4
+color: 102, 153, 255
+
+SPHERE
+position: -6, 12, 4
+color: 102, 153, 255
+
+SPHERE
+position: -4, 12, 4
+color: 102, 153, 255
+
+SPHERE
+position: -2, 12, 4
+color: 102, 153, 255
+
+SPHERE
+position: 0, 12, 4
+color: 102, 153, 255
+
+SPHERE
+position: 2, 12, 4
+color: 102, 153, 255
+
+SPHERE
+position: 4, 12, 4
+color: 102, 153, 255
+
+SPHERE
+position: 6, 12, 4
+color: 102, 153, 255
+
+SPHERE
+position: 8, 12, 4
+color: 102, 153, 255
+
+SPHERE
+position: -6, 14, 4
+color: 102, 153, 255
+
+SPHERE
+position: -4, 14, 4
+color: 102, 153, 255
+
+SPHERE
+position: -2, 14, 4
+color: 102, 153, 255
+
+SPHERE
+position: 0, 14, 4
+color: 102, 153, 255
+
+SPHERE
+position: 2, 14, 4
+color: 102, 153, 255
+
+SPHERE
+position: 4, 14, 4
+color: 102, 153, 255
+
+SPHERE
+position: 6, 14, 4
+color: 102, 153, 255
+
+SPHERE
+position: 8, 14, 4
+color: 102, 153, 255
+
+SPHERE
+position: -6, 16, 4
+color: 102, 153, 255
+
+SPHERE
+position: -4, 16, 4
+color: 102, 153, 255
+
+SPHERE
+position: -2, 16, 4
+color: 102, 153, 255
+
+SPHERE
+position: 0, 16, 4
+color: 102, 153, 255
+
+SPHERE
+position: 2, 16, 4
+color: 102, 153, 255
+
+SPHERE
+position: 4, 16, 4
+color: 102, 153, 255
+
+SPHERE
+position: 6, 16, 4
+color: 102, 153, 255
+
+SPHERE
+position: 8, 16, 4
+color: 102, 153, 255
+
+SPHERE
+position: -6, 18, 4
+color: 102, 153, 255
+
+SPHERE
+position: -4, 18, 4
+color: 102, 153, 255
+
+SPHERE
+position: -2, 18, 4
+color: 102, 153, 255
+
+SPHERE
+position: 0, 18, 4
+color: 102, 153, 255
+
+SPHERE
+position: 2, 18, 4
+color: 102, 153, 255
+
+SPHERE
+position: 4, 18, 4
+color: 102, 153, 255
+
+SPHERE
+position: 6, 18, 4
+color: 102, 153, 255
+
+SPHERE
+position: 8, 18, 4
+color: 102, 153, 255
+
+SPHERE
+position: -6, 20, 4
+color: 102, 153, 255
+
+SPHERE
+position: -4, 20, 4
+color: 102, 153, 255
+
+SPHERE
+position: -2, 20, 4
+color: 102, 153, 255
+
+SPHERE
+position: 0, 20, 4
+color: 102, 153, 255
+
+SPHERE
+position: 2, 20, 4
+color: 102, 153, 255
+
+SPHERE
+position: 4, 20, 4
+color: 102, 153, 255
+
+SPHERE
+position: 6, 20, 4
+color: 102, 153, 255
+
+SPHERE
+position: 8, 20, 4
+color: 102, 153, 255
+
+SPHERE
+position: -6, 22, 4
+color: 102, 153, 255
+
+SPHERE
+position: -4, 22, 4
+color: 102, 153, 255
+
+SPHERE
+position: -2, 22, 4
+color: 102, 153, 255
+
+SPHERE
+position: 0, 22, 4
+color: 102, 153, 255
+
+SPHERE
+position: 2, 22, 4
+color: 102, 153, 255
+
+SPHERE
+position: 4, 22, 4
+color: 102, 153, 255
+
+SPHERE
+position: 6, 22, 4
+color: 102, 153, 255
+
+SPHERE
+position: 8, 22, 4
+color: 102, 153, 255
+
+SPHERE
+position: -6, 24, 4
+color: 102, 153, 255
+
+SPHERE
+position: -4, 24, 4
+color: 102, 153, 255

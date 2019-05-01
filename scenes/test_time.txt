@@ -1,0 +1,99 @@
+CAMERA
+position: 0, 0, -10
+
+LIGHT
+position: 3, 3, -1
+intensity: 0.7
+
+LIGHT
+position: -3, 3, -1
+intensity: 0.3
+
+PLANE
+position: 0, 0, 10
+direction: 0, 0, -1
+color: 51, 204, 51
+
+PLANE
+position: 0, -2, 0
+color: 51, 204, 51
+
+SPHERE
+position: -1, 0, 4
+color: 102, 153, 255
+reflective: 0.4
+
+SPHERE
+position: 2, 0, 4
+color: 102, 153, 255
+reflective: 0.4
+
+SPHERE
+position: 4, 0, 4
+color: 102, 153, 255
+reflective: 0.4
+
+SPHERE
+position: 6, 0, 4
+color: 102, 153, 255
+reflective: 0.4
+
+SPHERE
+position: 6, 2, 4
+color: 102, 153, 255
+reflective: 0.4
+
+SPHERE
+position: 4, 2, 4
+color: 102, 153, 255
+reflective: 0.4
+
+SPHERE
+position: 2, 2, 4
+color: 102, 153, 255
+reflective: 0.4
+
+SPHERE
+position: 0, 2, 4
+color: 102, 153, 255
+reflective: 0.4
+
+SPHERE
+position: -2, 2, 4
+color: 102, 153, 255
+reflective: 0.4
+
+SPHERE
+position: -4, 2, 4
+color: 102, 153, 255
+reflective: 0.4
+
+SPHERE
+position: 6, 4, 4
+color: 102, 153, 255
+reflective: 0.4
+
+SPHERE
+position: 4, 4, 4
+color: 102, 153, 255
+reflective: 0.4
+
+SPHERE
+position: 2, 4, 4
+color: 102, 153, 255
+reflective: 0.4
+
+SPHERE
+position: 0, 4, 4
+color: 102, 153, 255
+reflective: 0.4
+
+SPHERE
+position: 4, 6, 4
+color: 102, 153, 255
+reflective: 0.4
+
+SPHERE
+position: 2, 6, 4
+color: 102, 153, 255
+reflective: 0.4

@@ -1,0 +1,467 @@
+CAMERA
+position: 0, 0, -20
+
+LIGHT
+position: -9, 5, 4
+intensity: 0.9
+
+LIGHT
+position: 9, 5, 4
+intensity: 0.7
+
+PLANE
+position: 0, 0, 20
+direction: 0, 0, -1
+color: 255, 255, 255
+
+PLANE
+position: 0, -2, 0
+color: 255, 255, 255
+
+============ LEFT FRONT ===============
+
+SPHERE
+position: -4, 0, 6
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: -2, 0, 5 
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 0, 0, 4 
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 2, 0, 3 
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 4, 0, 2 
+color: 153, 204, 255
+reflective: 0.3
+
+
+SPHERE
+position: -4, 2, 6
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: -2, 2, 5 
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 0, 2, 4 
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 2, 2, 3 
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 4, 2, 2 
+color: 153, 204, 255
+reflective: 0.3
+
+
+SPHERE
+position: -4, 4, 6
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: -2, 4, 5 
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 0, 4, 4 
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 2, 4, 3 
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 4, 4, 2 
+color: 153, 204, 255
+reflective: 0.3
+
+
+SPHERE
+position: -4, 6, 6
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: -2, 6, 5 
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 0, 6, 4 
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 2, 6, 3 
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 4, 6, 2 
+color: 153, 204, 255
+reflective: 0.3
+
+
+SPHERE
+position: -4, 8, 6
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: -2, 8, 5 
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 0, 8, 4 
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 2, 8, 3 
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 4, 8, 2 
+color: 153, 204, 255
+reflective: 0.3
+============ RIGHT FRONT ===============
+
+SPHERE
+position: 5.5, 0, 4
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 7, 0, 6
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 8.5, 0, 8
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 10, 0, 10
+color: 153, 204, 255
+reflective: 0.3
+
+
+SPHERE
+position: 5.5, 2, 4
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 7, 2, 6
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 8.5, 2, 8
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 10, 2, 10
+color: 153, 204, 255
+reflective: 0.3
+
+
+SPHERE
+position: 5.5, 4, 4
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 7, 4, 6
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 8.5, 4, 8
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 10, 4, 10
+color: 153, 204, 255
+reflective: 0.3
+
+
+SPHERE
+position: 5.5, 6, 4
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 7, 6, 6
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 8.5, 6, 8
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 10, 6, 10
+color: 153, 204, 255
+reflective: 0.3
+
+
+SPHERE
+position: 5.5, 8, 4
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 7, 8, 6
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 8.5, 8, 8
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 10, 8, 10
+color: 153, 204, 255
+reflective: 0.3
+
+============ LEFT BOTTOM ===============
+
+SPHERE
+position: -3, 0, 8
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: -2, 0, 10
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: -1, 0, 12
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 0, 0, 14
+color: 153, 204, 255
+reflective: 0.3
+
+
+SPHERE
+position: -3, 2, 8
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: -2, 2, 10
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: -1, 2, 12
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 0, 2, 14
+color: 153, 204, 255
+reflective: 0.3
+
+
+SPHERE
+position: -3, 4, 8
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: -2, 4, 10
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: -1, 4, 12
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 0, 4, 14
+color: 153, 204, 255
+reflective: 0.3
+
+
+SPHERE
+position: -3, 6, 8
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: -2, 6, 10
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: -1, 6, 12
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 0, 6, 14
+color: 153, 204, 255
+reflective: 0.3
+
+
+SPHERE
+position: -3, 8, 8
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: -2, 8, 10
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: -1, 8, 12
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 0, 8, 14
+color: 153, 204, 255
+reflective: 0.3
+
+============ RIGHT BOTTOM ===============
+
+SPHERE
+position: 2, 0, 13
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 4, 0, 12
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 6, 0, 11
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 8, 0, 10
+color: 153, 204, 255
+reflective: 0.3
+
+
+SPHERE
+position: 2, 2, 13
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 4, 2, 12
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 6, 2, 11
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 8, 2, 10
+color: 153, 204, 255
+reflective: 0.3
+
+
+SPHERE
+position: 2, 4, 13
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 4, 4, 12
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 6, 4, 11
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 8, 4, 10
+color: 153, 204, 255
+reflective: 0.3
+
+
+SPHERE
+position: 2, 6, 13
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 4, 6, 12
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 6, 6, 11
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 8, 6, 10
+color: 153, 204, 255
+reflective: 0.3
+
+
+SPHERE
+position: 2, 8, 13
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 4, 8, 12
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 6, 8, 11
+color: 153, 204, 255
+reflective: 0.3
+
+SPHERE
+position: 8, 8, 10
+color: 153, 204, 255
+reflective: 0.3

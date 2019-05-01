@@ -34,7 +34,7 @@
 # define PROJECTION_PLANE_Z 1
 # define FOV 60
 
-# define THREADS 4
+# define THREADS 8
 
 /*
 ** For light
