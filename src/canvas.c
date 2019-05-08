@@ -48,7 +48,6 @@ int		mult_k_color(double k, int color)
 	r *= k;
 	g *= k;
 	b *= k;
-	// Clamps a color to the canonical color range.
 	r = fmin(255, fmax(0, r));
 	g = fmin(255, fmax(0, g));
 	b = fmin(255, fmax(0, b));

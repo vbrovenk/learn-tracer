@@ -27,7 +27,6 @@ t_shape	*create_shape(int type)
 	shape->height_cone2 = INFINIT;
 	shape->dir = create_point(0, 1, 0);
 	shape->specular = 500;
-	// shape->reflective = 0.5;
 	shape->next = NULL;
 	return (shape);
 }

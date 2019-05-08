@@ -59,9 +59,10 @@ int		trace_ray(t_tracer *tracer, t_point *origin, double t_min, double t_max)
 
 void	render(t_tracer *tracer)
 {
-	int x;
-	int y;
-	int color;
+	int		x;
+	int		y;
+	int		color;
+	t_point	*temp;
 
 	x = -WIDTH / 2;
 	while (x < WIDTH / 2)
@@ -70,9 +71,12 @@ void	render(t_tracer *tracer)
 		while (y < tracer->start + HEIGHT / THREADS)
 		{
 			tracer->d = canvas_to_viewport(x, y);
-			rotation_x(tracer);
-			// rotation_y(tracer);
-			tracer->d = mult_vec_matrix(tracer->d, tracer->camera_rotation);
+			temp = tracer->d;
+			tracer->d = rotation_x(tracer->d, tracer->degrees_x);
+			free(temp);
+			temp = tracer->d;
+			tracer->d = rotation_y(tracer->d, tracer->degrees_y);
+			free(temp);
 			color = trace_ray(tracer, tracer->camera_position, 1.0, INFINIT);
 			put_pixel(tracer, x, y, color);
 			free(tracer->d);
@@ -109,8 +113,7 @@ void	start_threads(t_tracer *tracer)
 												tracer->img_ptr, 0, 0);
 }
 
-// compilation without FLAGS
-int	main(int argc, char *argv[])
+int		main(int argc, char *argv[])
 {
 	t_tracer	*tracer;
 	char		*extension;
@@ -131,7 +134,6 @@ int	main(int argc, char *argv[])
 	read_data(tracer, argv[1]);
 	if (tracer->camera_position == NULL)
 		print_error("Camera must be set");
-	init_rotation(tracer);
 	start_threads(tracer);
 	mlx_hook(tracer->win_ptr, 2, 5, choose_key, tracer);
 	mlx_hook(tracer->win_ptr, 17, 1L << 17, x_exit, 0);

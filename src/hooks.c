@@ -20,7 +20,6 @@ t_tracer	*init_struct(void)
 	tracer->mlx_ptr = NULL;
 	tracer->win_ptr = NULL;
 	tracer->camera_position = NULL;
-	tracer->camera_rotation = NULL;
 	tracer->shapes = NULL;
 	tracer->lights = NULL;
 	tracer->d = NULL;
@@ -36,18 +35,40 @@ int			x_exit(void *param)
 	return (0);
 }
 
+void		new_position(t_tracer *tracer, int degrees_x, int degrees_y,
+															double coeff)
+{
+	t_point *new_camera;
+	t_point *temp;
+	t_point *temp2;
+
+	new_camera = canvas_to_viewport(0, 0);
+	temp = new_camera;
+	new_camera = rotation_x(new_camera, degrees_x);
+	free(temp);
+	temp = new_camera;
+	new_camera = rotation_y(new_camera, degrees_y);
+	free(temp);
+	temp = tracer->camera_position;
+	temp2 = mult_k_vec(coeff, new_camera);
+	tracer->camera_position = add_points(tracer->camera_position, temp2);
+	free(temp2);
+	free(temp);
+	free(new_camera);
+}
+
 int			choose_key(int key, t_tracer *tracer)
 {
 	if (key == ESC)
 		x_exit(tracer);
 	else if (key == ARROW_UP)
-		tracer->camera_position->z += 1;
+		new_position(tracer, tracer->degrees_x, tracer->degrees_y, 1);
 	else if (key == ARROW_DOWN)
-		tracer->camera_position->z -= 1;
+		new_position(tracer, tracer->degrees_x, tracer->degrees_y, -1);
 	else if (key == ARROW_LEFT)
-		tracer->camera_position->x -= 1;
+		new_position(tracer, 0, tracer->degrees_y - 90, 1);
 	else if (key == ARROW_RIGHT)
-		tracer->camera_position->x += 1;
+		new_position(tracer, 0, tracer->degrees_y + 90, 1);
 	else if (key == NUM_8)
 		tracer->camera_position->y += 1;
 	else if (key == NUM_2)

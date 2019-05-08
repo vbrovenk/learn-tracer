@@ -12,36 +12,26 @@
 
 #include "raytray.h"
 
-void	init_rotation(t_tracer *tracer)
+t_point	*rotation_x(t_point *old, int degrees)
 {
-	int i;
-	int j;
+	t_point	*new;
 
-	tracer->camera_rotation = (t_m3x3 *)malloc(sizeof(t_m3x3));
-	i = -1;
-	while (++i < 3)
-	{
-		j = -1;
-		while (++j < 3)
-			tracer->camera_rotation->matrix[i][j] = 0;
-	}
-	tracer->camera_rotation->matrix[0][0] = 1;
-	tracer->camera_rotation->matrix[1][1] = 1;
-	tracer->camera_rotation->matrix[2][2] = 1;
+	new = create_point(old->x, old->y, old->z);
+	new->y = old->y * cos(degrees * M_PI / 180) -
+										old->z * sin(degrees * M_PI / 180);
+	new->z = old->y * sin(degrees * M_PI / 180) +
+										old->z * cos(degrees * M_PI / 180);
+	return (new);
 }
 
-void	rotation_x(t_tracer *tracer)
+t_point	*rotation_y(t_point *old, int degrees)
 {
-	tracer->camera_rotation->matrix[1][1] = cos(tracer->degrees_x * M_PI / 180);
-	tracer->camera_rotation->matrix[1][2] = -sin(tracer->degrees_x * M_PI / 180);
-	tracer->camera_rotation->matrix[2][1] = sin(tracer->degrees_x * M_PI / 180);
-	tracer->camera_rotation->matrix[2][2] = cos(tracer->degrees_x * M_PI / 180);
-}
+	t_point	*new;
 
-void	rotation_y(t_tracer *tracer)
-{
-	tracer->camera_rotation->matrix[0][0] = cos(tracer->degrees_y * M_PI / 180);
-	tracer->camera_rotation->matrix[0][2] = sin(tracer->degrees_y * M_PI / 180);
-	tracer->camera_rotation->matrix[2][0] = -sin(tracer->degrees_y * M_PI / 180);
-	tracer->camera_rotation->matrix[2][2] = cos(tracer->degrees_y * M_PI / 180);
+	new = create_point(old->x, old->y, old->z);
+	new->x = old->x * cos(degrees * M_PI / 180) +
+										old->z * sin(degrees * M_PI / 180);
+	new->z = -old->x * sin(degrees * M_PI / 180) +
+										old->z * cos(degrees * M_PI / 180);
+	return (new);
 }
