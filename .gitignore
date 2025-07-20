@@ -2,3 +2,4 @@
 *.o
 RTv1
 libft.a
+.vscode

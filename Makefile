@@ -18,7 +18,8 @@ INC_DIR = .
 LIBFT_INC = ./libft/includes/
 LIBFT = ./libft/libft.a
 
-MLX_FLAGS = -lmlx -framework OpenGL -framework AppKit
+MLX_INC = minilibx
+MLX_FLAGS = -L minilibx/mlx_macos -lmlx -framework OpenGL -framework AppKit
 
 SRC =	main.c \
 		actions_with_points.c \
@@ -39,7 +40,7 @@ SRC =	main.c \
 
 OBJ = $(addprefix obj/, $(SRC:.c=.o))
 
-CFLAGS = -Wall -Wextra -Werror
+#CFLAGS = -Wall -Wextra -Werror
 
 OFF=\033[0m
 PURPLE=\033[0;35m
@@ -49,15 +50,18 @@ PURPLELIGHT=\033[38;2;102;102;255m
 
 all: $(NAME)
 
-$(NAME): libft/libft.a obj $(OBJ)
+$(NAME): libft/libft.a obj $(OBJ) minilibx_MacOS
 	@gcc $(OBJ) $(LIBFT) $(MLX_FLAGS) -o $(NAME)
 	@echo "$(PURPLEBOLD)RTv1 $(PURPLE)is ready$(OFF)"
 
 libft/libft.a:
 	@make -C libft/
 
+minilibx_MacOS:
+	@make -C minilibx/mlx_macos
+
 obj/%.o: src/%.c $(INCLUDE)
-	@gcc -c $< -o $@  -I $(LIBFT_INC) -I $(INC_DIR) $(CFLAGS)
+	@gcc -c $< -o $@  -I $(LIBFT_INC) -I $(INC_DIR) -I $(MLX_INC) $(CFLAGS)
 	@echo "$(PURPLELIGHT)Compiling $(WHITE)$< $(PURPLELIGHT)done$(OFF)"
 
 obj:
@@ -68,6 +72,7 @@ clean:
 	@rm -rf obj
 
 fclean: clean
+	@make clean -C minilibx/mlx_macos
 	@make fclean -C libft/
 	@rm -rf $(NAME)
 
