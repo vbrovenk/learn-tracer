@@ -64,6 +64,7 @@ double		compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 	t_specular	*spec;
 
 	spec = init_specular(tracer);
+
 	while (spec->current_light != NULL)
 	{
 		spec->vec_l = subtract_points(spec->current_light->position, point);
@@ -81,7 +82,8 @@ double		compute_lighting(t_tracer *tracer, t_point *point, t_point *normal,
 		free(spec->vec_l);
 		spec->current_light = spec->current_light->next;
 	}
+	double lighting = spec->intensity;
 	free(spec->view);
 	free(spec);
-	return (spec->intensity);
+	return (lighting);
 }
